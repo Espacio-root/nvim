@@ -62,13 +62,6 @@ return {
 
       -- External programs
       {
-        "<leader>gl",
-        function()
-          lazygit:toggle()
-        end,
-        desc = "LazyGit",
-      },
-      {
         "<leader>pd",
         function()
           lazydocker:toggle()
