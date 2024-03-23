@@ -77,3 +77,41 @@ vim.api.nvim_create_autocmd({ "ColorScheme" }, {
   pattern = "*",
   callback = ColorMyPencils,
 })
+
+-- autocmd to change kitty padding
+vim.cmd [[
+augroup kitty_mp
+    autocmd!
+    au VimLeave * :silent !kitty @ set-spacing padding=20 margin=10
+    au VimEnter * :silent !kitty @ set-spacing padding=0 margin=0
+augroup END
+]]
+
+local kitty_group = vim.api.nvim_create_augroup("kitty_mp", {})
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = kitty_group,
+  pattern = "*",
+  desc = "Set kitty padding",
+  callback = function()
+    vim.fn.system("kitty @ set-spacing padding=5")
+  end,
+})
+
+vim.api.nvim_create_autocmd("VimLeave", {
+  group = kitty_group,
+  pattern = "*",
+  desc = "Set kitty padding",
+  callback = function()
+    vim.fn.system("kitty @ set-spacing padding=20")
+  end,
+})
+
+vim.api.nvim_create_autocmd({"VimResized", "WinResized"}, {
+  group = vim.api.nvim_create_augroup("resize", {}),
+  pattern = "*",
+  desc = "Update window size",
+  callback = function()
+    vim.cmd("wincmd =")
+  end,
+})
