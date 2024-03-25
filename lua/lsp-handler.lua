@@ -11,11 +11,11 @@ local servers = {
 	"lua_ls",
 	"cssls",
 	"html",
-	"tsserver",
 	"pyright",
 	"bashls",
 	"jsonls",
 	"yamlls",
+	"tailwindcss",
 }
 
 M.servers = servers
@@ -94,7 +94,13 @@ end
 
 M.on_attach = function(client, bufnr)
 	if client.name == "tsserver" then
+		local augroup = vim.api.nvim_create_augroup("TypescriptAutoImport", {})
 		client.server_capabilities.documentFormattingProvider = false
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			group = augroup,
+			buffer = bufnr,
+			command = "TypescriptAddMissingImports",
+		})
 	end
 
 	if client.name == "sumneko_lua" then

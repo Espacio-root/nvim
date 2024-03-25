@@ -1,5 +1,4 @@
 local custom = require "customization"
-local utils = require "utils"
 
 local mode = custom.prefer_tabpage and "tab" or "buffer"
 
@@ -57,9 +56,6 @@ return {
       or { "<M-S-l>", "<Cmd>BufferLineMoveNext<CR>", desc = "Move buffer to next" },
     custom.prefer_tabpage and { "<M-S-h>", "<Cmd>-tabmove<CR>", desc = "Move tab to previous" }
       or { "<M-S-h>", "<Cmd>BufferLineMovePrev<CR>", desc = "Move buffer to previous" },
-
-    { "<S-l>", "<cmd>BufferLineCycleNext<CR>", desc = utils.firstToUpper(mode) },
-    { "<S-h>", "<cmd>BufferLineCyclePrev<CR>", desc = utils.firstToUpper(mode) },
 
     { "<leader>bc", "<cmd>BufferLinePickClose<CR>", desc = "Close" },
     { "<leader>bw", "<cmd>BufferLineCloseOthers<CR>", desc = "Close" },

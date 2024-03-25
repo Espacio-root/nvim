@@ -41,18 +41,18 @@ local wr_group = vim.api.nvim_create_augroup('WinResize', { clear = true })
 -- resize windows when new window is opened
 local function normalizeTableValues(inputTable)
     local totalSum = 0
-    
+
     -- Calculate the total sum
     for _, value in pairs(inputTable) do
         totalSum = totalSum + value
     end
-    
+
     -- Normalize values
     local normalizedTable = {}
     for id, value in pairs(inputTable) do
         normalizedTable[id] = value / totalSum
     end
-    
+
     return normalizedTable
 end
 

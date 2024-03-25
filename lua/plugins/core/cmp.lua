@@ -22,6 +22,29 @@ return {
     local cmp = require "cmp"
     local luasnip = require "luasnip"
     local lspkind = require "lspkind"
+    local tailwind_formatter = require("tailwindcss-colorizer-cmp").formatter
+
+    local function custom_formatter(entry, vim_item)
+      local lspkind_formatted = lspkind.cmp_format {
+        mode = "symbol",
+        maxwidth = 50,
+        menu = {
+          luasnip = "[SNP]",
+          nvim_lsp = "[LSP]",
+          nvim_lua = "[VIM]",
+          buffer = "[BUF]",
+          path = "[PTH]",
+          calc = "[CLC]",
+          latex_symbols = "[TEX]",
+          orgmode = "[ORG]",
+        },
+      }(entry, vim_item)
+
+      local tailwind_formatted = tailwind_formatter(entry, vim_item)
+
+      -- Merge the two formatted results
+      return vim.tbl_extend('keep', lspkind_formatted, tailwind_formatted)
+    end
 
     -- local has_words_before = function()
     --   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -104,7 +127,7 @@ return {
       },
       formatting = {
         format = lspkind.cmp_format {
-          mode = "symbol",
+          mode = "symbol_text",
           maxwidth = 50,
           menu = {
             luasnip = "[SNP]",
@@ -116,7 +139,9 @@ return {
             latex_symbols = "[TEX]",
             orgmode = "[ORG]",
           },
+          before = require("tailwindcss-colorizer-cmp").formatter,
         },
+        -- format = custom_formatter,
         fields = {
           "kind",
           "abbr",

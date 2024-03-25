@@ -2,6 +2,7 @@ local custom = require "customization"
 
 return {
   "Bekaboo/dropbar.nvim",
+  enabled = false,
   event = {
     "BufRead",
     "BufNewFile",
