@@ -16,6 +16,7 @@ local servers = {
 	"jsonls",
 	"yamlls",
 	"tailwindcss",
+	"rust_analyzer"
 }
 
 M.servers = servers

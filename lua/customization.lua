@@ -5,7 +5,7 @@ M.prefer_tabpage = false
 M.border = "rounded"
 
 M.width = function()
-    return math.max(math.floor(vim.go.columns*0.2), 25)
+  return math.max(math.floor(vim.go.columns * 0.2), 25)
 end
 
 local append_space = function(icons)

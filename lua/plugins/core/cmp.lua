@@ -127,7 +127,7 @@ return {
       },
       formatting = {
         format = lspkind.cmp_format {
-          mode = "symbol_text",
+          mode = "symbol",
           maxwidth = 50,
           menu = {
             luasnip = "[SNP]",
