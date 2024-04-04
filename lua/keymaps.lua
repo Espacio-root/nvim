@@ -8,10 +8,10 @@ vim.keymap.set("n", "<C-j>", function() vim.cmd("wincmd j") end, { noremap = tru
 vim.keymap.set("n", "<C-k>", function() vim.cmd("wincmd k") end, { noremap = true, silent = true })
 
 -- resize windows through vim motions
-vim.keymap.set('n', '<C-S-K>', function() vim.cmd("resize -2") end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-S-J>', function() vim.cmd("resize +2") end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-S-L>', function() vim.cmd("vertical resize +2") end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-S-H>', function() vim.cmd("vertical resize -2") end, { noremap = true, silent = true })
+-- vim.keymap.set('n', '<C-S-K>', function() vim.cmd("resize +2") end, { noremap = true, silent = true })
+-- vim.keymap.set('n', '<C-S-J>', function() vim.cmd("resize -2") end, { noremap = true, silent = true })
+-- vim.keymap.set('n', '<C-S-L>', function() vim.cmd("vertical resize -2") end, { noremap = true, silent = true })
+-- vim.keymap.set('n', '<C-S-H>', function() vim.cmd("vertical resize +2") end, { noremap = true, silent = true })
 
 -- resize windows
 

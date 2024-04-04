@@ -82,17 +82,6 @@ return {
   },
   keys = {
     {
-      "<C-F>",
-      function()
-        if not require("noice.lsp").scroll(4) then
-          return "<c-f>"
-        end
-      end,
-      mode = { "n", "i", "s" },
-      silent = true,
-      expr = true,
-    },
-    {
       "<C-B>",
       function()
         if not require("noice.lsp").scroll(-4) then
