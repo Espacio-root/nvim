@@ -11,7 +11,7 @@ return {
   config = true,
     keys = {
         {
-            "<leader>g",
+            "<leader>gg",
             "<cmd>Neogit<CR>",
             mode = "n",
             desc = "modern git integration",

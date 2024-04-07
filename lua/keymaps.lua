@@ -15,6 +15,28 @@ vim.keymap.set("n", "<C-k>", function() vim.cmd("wincmd k") end, { noremap = tru
 
 -- resize windows
 
+-- debug window
+local virtual_text = false
+local toggle_virtual_text = function()
+  if virtual_text then
+    vim.diagnostic.config {
+      virtual_text = false
+    }
+  else
+    vim.diagnostic.config {
+      virtual_text = {
+        spacing = 4,
+        prefix = "●",
+        severity = vim.diagnostic.severity.ERROR
+      }
+    }
+  end
+  virtual_text = not virtual_text
+  vim.notify("virtual_text set to " .. tostring(virtual_text))
+end
+
+vim.keymap.set("n", "<leader>ld", toggle_virtual_text, {noremap = true, silent = true, desc = "Toggle virtual text"})
+
 -- toggle quickfix
 local function toggle_quickfix()
   local wins = vim.fn.getwininfo()

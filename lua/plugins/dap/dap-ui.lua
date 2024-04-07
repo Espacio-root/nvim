@@ -2,6 +2,9 @@ local custom = require "customization"
 
 return {
   "rcarriga/nvim-dap-ui",
+  dependencies = {
+    "nvim-neotest/nvim-nio",
+  },
   opts = {
     floating = {
       border = custom.border,

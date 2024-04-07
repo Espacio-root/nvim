@@ -115,3 +115,10 @@ vim.api.nvim_create_autocmd({"VimResized", "WinResized"}, {
     vim.cmd("wincmd =")
   end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "*",
+  callback = function()
+    vim.opt_local.formatoptions:remove({ 'r', 'o' })
+  end,
+})

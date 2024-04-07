@@ -13,7 +13,8 @@ vim.opt.smartcase = true
 vim.opt.list = true
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.includeexpr = "substitute(v:fname,'\\.','/','g')"
-vim.opt.jumpoptions = "stack"
+-- vim.opt.jumpoptions = "stack"
+-- vim.opt.paste = true
 
 -- Interface
 vim.opt.confirm = true
