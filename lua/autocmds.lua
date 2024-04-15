@@ -1,4 +1,5 @@
 local group = vim.api.nvim_create_augroup("ofseed", {})
+local custom = require("customization")
 
 ---@param scope "global" | "local"
 local function set_breakindentopt(scope)
@@ -107,12 +108,25 @@ vim.api.nvim_create_autocmd("VimLeave", {
   end,
 })
 
+local function get_neotree_winid()
+  local window_table = vim.fn.getwininfo()
+  for _, win_info in ipairs(window_table) do
+    if win_info.variables and win_info.variables.neo_tree_settings_applied then
+      return win_info.winid
+    end
+  end
+  return nil
+end
+
 vim.api.nvim_create_autocmd({"VimResized", "WinResized"}, {
-  group = vim.api.nvim_create_augroup("resize", {}),
   pattern = "*",
   desc = "Update window size",
   callback = function()
-    vim.cmd("wincmd =")
+    local winid = get_neotree_winid()
+    print(winid)
+    if winid then
+      vim.api.nvim_win_set_width(winid, custom.width())
+    end
   end,
 })
 

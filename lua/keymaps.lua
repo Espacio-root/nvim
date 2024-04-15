@@ -1,6 +1,9 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = "  "
 
+-- convenient pastes
+-- vim.keymap.set("n", "p", "\"0p", { noremap = true })
+
 -- move through windows
 vim.keymap.set("n", "<C-h>", function() vim.cmd("wincmd h") end, { noremap = true, silent = true })
 vim.keymap.set("n", "<C-l>", function() vim.cmd("wincmd l") end, { noremap = true, silent = true })
