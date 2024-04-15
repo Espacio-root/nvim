@@ -123,7 +123,6 @@ vim.api.nvim_create_autocmd({"VimResized", "WinResized"}, {
   desc = "Update window size",
   callback = function()
     local winid = get_neotree_winid()
-    print(winid)
     if winid then
       vim.api.nvim_win_set_width(winid, custom.width())
     end
