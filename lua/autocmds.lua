@@ -120,7 +120,7 @@ end
 
 vim.api.nvim_create_autocmd({"VimResized", "WinResized"}, {
   pattern = "*",
-  desc = "Update window size",
+  desc = "Update neotree size",
   callback = function()
     local winid = get_neotree_winid()
     if winid then
@@ -135,3 +135,12 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.formatoptions:remove({ 'r', 'o' })
   end,
 })
+
+-- local debug_group = vim.api.nvim_create_augroup("debug", {})
+-- vim.api.nvim_create_autocmd({"BufWinEnter", "WinEnter"}, {
+--   group = debug_group,
+--   pattern = "*",
+--   callback = function()
+--     print("Win Resized")
+--   end,
+-- })

@@ -134,6 +134,16 @@ return {
     document_symbols = {
       kinds = kinds,
     },
+    event_handlers = {
+      {
+        event = "neo_tree_window_after_open",
+        handler = function(args)
+          if args.position == "left" or args.position == "right" then
+            vim.cmd("wincmd =")
+          end
+        end
+      },
+    }
   },
   keys = {
     { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "File Explorer" },

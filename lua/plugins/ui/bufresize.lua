@@ -17,6 +17,7 @@ return {
       trigger_events = { "BufWinEnter", "WinEnter" },
     },
     resize = {
+      -- keys = {{"n", "<leader>e", "<cmd>Neotree toggle<cr>", opts}},
       keys = {},
       trigger_events = { "VimResized" },
       increment = false,

@@ -6,6 +6,7 @@ return {
   "ibhagwan/fzf-lua",
   cmd = { "FzfLua" },
   opts = {
+    hidden=true,
     hls = {
       normal = "NormalFloat",
       border = "FloatBorder",
