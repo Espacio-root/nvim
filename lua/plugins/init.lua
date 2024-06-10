@@ -9,4 +9,5 @@ return {
     { import = "plugins.git" },
     { import = "plugins.treesitter" },
     { import = "plugins.ai" },
+    { import = "plugins.note-taking" },
 }

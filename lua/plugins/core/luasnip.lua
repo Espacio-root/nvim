@@ -4,6 +4,9 @@ return {
     "InsertEnter",
     "CmdlineEnter",
   },
+  dependencies = {
+    { "rafamadriz/friendly-snippets" },
+  },
   config = function()
     local snip = require "luasnip"
     local types = require "luasnip.util.types"
@@ -13,28 +16,30 @@ return {
 
     snip.setup {
       update_events = { "TextChanged", "TextChangedI" },
-      ext_opts = {
-        [types.choiceNode] = {
-          active = {
-            virt_text = { { "●", "Operator" } },
-            virt_text_pos = "inline",
-          },
-          unvisited = {
-            virt_text = { { "●", "Comment" } },
-            virt_text_pos = "inline",
-          },
-        },
-        [types.insertNode] = {
-          active = {
-            virt_text = { { "●", "Keyword" } },
-            virt_text_pos = "inline",
-          },
-          unvisited = {
-            virt_text = { { "●", "Comment" } },
-            virt_text_pos = "inline",
-          },
-        },
-      },
+      enable_autosnippets = true,
+      delete_check_events = "TextChanged",
+      -- ext_opts = {
+      --   [types.choiceNode] = {
+      --     active = {
+      --       virt_text = { { "●", "Operator" } },
+      --       virt_text_pos = "inline",
+      --     },
+      --     unvisited = {
+      --       virt_text = { { "●", "Comment" } },
+      --       virt_text_pos = "inline",
+      --     },
+      --   },
+      --   [types.insertNode] = {
+      --     active = {
+      --       virt_text = { { "●", "Keyword" } },
+      --       virt_text_pos = "inline",
+      --     },
+      --     unvisited = {
+      --       virt_text = { { "●", "Comment" } },
+      --       virt_text_pos = "inline",
+      --     },
+      --   },
+      -- },
       snip_env = {
         -- Same with text node, used for function nodes
         text_same_with = function(args)
@@ -83,4 +88,8 @@ return {
     }
     require("luasnip.loaders.from_vscode").lazy_load()
   end,
+  keys = {
+    { "<C-n>", "<Plug>luasnip-next-choice", mode = {"i", "s"} },
+    { "<C-p>", "<Plug>luasnip-prev-choice", mode = {"i", "s"} },
+  }
 }
