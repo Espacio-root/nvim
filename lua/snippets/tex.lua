@@ -145,7 +145,14 @@ local frac1 = s(
 )
 
 local frac2 = s(
-  { trig = "((%d+)|(%d*)(\\)?([A-Za-z]+)((%^|_)(%{%d+%}|%d))*)/" }
+  { trig = "((%d*)(\\?)([A-Za-z]+)([%^_]{?(%d+)%}?))/" , dsrc = "fraction - type 2", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
+  fmta([[
+  \frac{<num>}{<den>}<after>
+  ]], {
+      num = f(function(_,snip) return snip.captures[1] end),
+      den = i(1),
+      after = i(0),
+    })
 )
 
 
@@ -163,5 +170,6 @@ return {
   cb,
   compl,
   td,
-  frac1
+  frac1,
+  frac2,
 }

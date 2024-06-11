@@ -14,42 +14,14 @@ return {
     { "hrsh7th/cmp-path" },
     { "hrsh7th/cmp-cmdline" },
     { "hrsh7th/cmp-calc" },
-    { "saadparwaiz1/cmp_luasnip" },
+    { "quangnguyen30192/cmp-nvim-ultisnips" },
     { "kristijanhusak/vim-dadbod-completion" },
     { "lukas-reineke/cmp-under-comparator" },
   },
   config = function()
     local cmp = require "cmp"
-    local luasnip = require "luasnip"
+    local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
     local lspkind = require "lspkind"
-    local tailwind_formatter = require("tailwindcss-colorizer-cmp").formatter
-
-    local function custom_formatter(entry, vim_item)
-      local lspkind_formatted = lspkind.cmp_format {
-        mode = "symbol",
-        maxwidth = 50,
-        menu = {
-          luasnip = "[SNP]",
-          nvim_lsp = "[LSP]",
-          nvim_lua = "[VIM]",
-          buffer = "[BUF]",
-          path = "[PTH]",
-          calc = "[CLC]",
-          latex_symbols = "[TEX]",
-          orgmode = "[ORG]",
-        },
-      }(entry, vim_item)
-
-      local tailwind_formatted = tailwind_formatter(entry, vim_item)
-
-      -- Merge the two formatted results
-      return vim.tbl_extend('keep', lspkind_formatted, tailwind_formatted)
-    end
-
-    -- local has_words_before = function()
-    --   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    --   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
-    -- end
 
     cmp.setup {
       window = {
@@ -63,7 +35,7 @@ return {
       },
       snippet = {
         expand = function(args)
-          luasnip.lsp_expand(args.body)
+          vim.fn["UltiSnips#Anon"](args.body)
         end,
       },
       mapping = {
@@ -77,38 +49,18 @@ return {
           c = cmp.mapping.close(),
         },
         ["<CR>"] = cmp.mapping.confirm { select = true },
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          -- if cmp.visible() then
-          --   cmp.select_next_item()
-          if luasnip.expand_or_locally_jumpable() then
-            luasnip.expand_or_jump()
-          -- elseif has_words_before() then
-          --   cmp.complete()
-          else
-            fallback() --Fallback to tabout of `ultimate-autopair` as expected
-          end
-        end, {
-          "i",
-          "s",
-          "c",
-        }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          -- if cmp.visible() then
-          --   cmp.select_prev_item()
-          if luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, {
-          "i",
-          "s",
-          "c",
-        }),
-      },
+        ["<Tab>"] = cmp.mapping(
+          function(fallback)
+            cmp_ultisnips_mappings.expand_or_jump_forwards(fallback)
+          end, {"i", "s", "c"}),
+        ["<S-Tab>"] = cmp.mapping(
+          function(fallback)
+            cmp_ultisnips_mappings.jump_backwards(fallback)
+          end, { "i", "s", "c" }
+        )},
       sources = {
         { name = "nvim_lsp" },
-        { name = "luasnip" },
+        { name = "ultisnips" },
         {
           name = "buffer",
           option = {
@@ -130,7 +82,7 @@ return {
           mode = "symbol",
           maxwidth = 50,
           menu = {
-            luasnip = "[SNP]",
+            ultisnip = "[SNP]",
             nvim_lsp = "[LSP]",
             nvim_lua = "[VIM]",
             buffer = "[BUF]",
