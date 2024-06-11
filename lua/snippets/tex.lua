@@ -145,23 +145,62 @@ local frac1 = s(
 )
 
 local frac2 = s(
-  { trig = "((%d+)|(%d*)(\\)?([A-Za-z]+)((%^|_)(%{%d+%}|%d))*)/" }
+  { trig = "((%d*)(\\?)([A-Za-z]+)([%^_]?{?(%d*)%}?)([%^_]{?(%d+)%}?))/" , dsrc = "fraction - type 2", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
+  fmta([[
+  \frac{<num>}{<den>}<after>
+  ]], {
+      num = f(function(_,snip) return snip.captures[1] end),
+      den = i(1),
+      after = i(0),
+    })
+)
+
+local frac3 = s(
+  { trig = "(%d+)/", dsrc = "fraction - type 3", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
+  fmta([[
+  \frac{<num>}{<den>}<after>
+  ]], {
+      num = f(function(_,snip) return snip.captures[1] end),
+      den = i(1),
+      after = i(0),
+    })
+)
+
+local frac4 = s(
+  { trig = "^(.*%))/", dsrc = "() fraction", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
+  fmta([[
+  <num>{<den>}<after>
+  ]], {
+      num = f(function(_,snip)
+        local text = snip.captures[1]
+        local stripped = text:sub(1, #text)
+        local depth = 0
+        local i = #stripped
+        while true do
+            if stripped:sub(i,i) == ")" then
+                depth = depth + 1
+            elseif stripped:sub(i,i) == "(" then
+                depth = depth - 1
+            end
+            if depth == 0 or i < 1 then
+                break
+            end
+            i = i - 1
+        end
+        return stripped:sub(1,i-1) .. "\\frac{" .. stripped:sub(i+1, #stripped-1) .. "}"
+      end),
+      den = i(1),
+      after = i(0),
+    })
 )
 
 
 
 
 return {
-  sign,
-  box,
-  beg,
-  mk,
-  dm,
-  sub1,
-  sub2,
-  sr,
-  cb,
-  compl,
-  td,
-  frac1
+  sign, box, beg,
+  mk, dm,
+  sub1, sub2,
+  sr, cb, compl, td,
+  frac4
 }
