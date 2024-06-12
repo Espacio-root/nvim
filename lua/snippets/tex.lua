@@ -145,7 +145,7 @@ local frac1 = s(
 )
 
 local frac2 = s(
-  { trig = "((%d*)(\\?)([A-Za-z]+)([%^_]?{?(%d*)%}?)([%^_]{?(%d+)%}?))/" , dsrc = "fraction - type 2", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
+  { trig = [[((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\d+\}|\d))*)/]], dsrc = "fraction - type 2", wordTrig = false, snippetType = "autosnippet", trigEngine = "ecma"},
   fmta([[
   \frac{<num>}{<den>}<after>
   ]], {
@@ -156,17 +156,6 @@ local frac2 = s(
 )
 
 local frac3 = s(
-  { trig = "(%d+)/", dsrc = "fraction - type 3", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
-  fmta([[
-  \frac{<num>}{<den>}<after>
-  ]], {
-      num = f(function(_,snip) return snip.captures[1] end),
-      den = i(1),
-      after = i(0),
-    })
-)
-
-local frac4 = s(
   { trig = "^(.*%))/", dsrc = "() fraction", regTrig = true, wordTrig = false, snippetType = "autosnippet" },
   fmta([[
   <num>{<den>}<after>
@@ -202,5 +191,5 @@ return {
   mk, dm,
   sub1, sub2,
   sr, cb, compl, td,
-  frac4
+  frac1, frac2, frac3
 }
