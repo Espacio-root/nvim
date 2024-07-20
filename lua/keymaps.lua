@@ -1,8 +1,11 @@
 vim.g.mapleader = " "
-vim.g.maplocalleader = "  "
+vim.g.maplocalleader = ";"
 
 -- convenient pastes
 -- vim.keymap.set("n", "p", "\"0p", { noremap = true })
+
+-- delete copies to 1st register
+vim.keymap.set({"n", "v"}, "d", "\"1d", { noremap = true })
 
 -- move through windows
 vim.keymap.set("n", "<C-h>", function() vim.cmd("wincmd h") end, { noremap = true, silent = true })
@@ -58,3 +61,15 @@ end
 
 vim.keymap.set("n", "<leader>q", toggle_quickfix, { desc = "Quickfix" })
 vim.keymap.set("n", "<leader>tq", toggle_quickfix, { desc = "Quickfix" })
+
+local M = {}
+
+M.remap_tex = function()
+  -- Remap ; to \ for ease of use in latex
+  vim.keymap.set("i", ";", "\\", { noremap = true, silent = true })
+
+  -- Remap \ to ; for ease of use in latex
+  vim.keymap.set("i", "\\", ";", { noremap = true, silent = true })
+end
+
+return M

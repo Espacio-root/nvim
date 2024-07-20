@@ -13,6 +13,7 @@ return {
   },
   -- See Commands section for default commands if you want to lazy load on them
   keys = {
-    { "<leader>aco", "<cmd>CopilotChatToggle<cr>", opts }
+    { "<leader>aco", "<cmd>CopilotChatToggle<cr>", opts },
+    { "<leader>ace", "<cmd>CopilotChatExplain<cr>", opts },
   }
 }

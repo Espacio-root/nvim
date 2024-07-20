@@ -1,3 +1,4 @@
+local M = require("keymaps")
 local group = vim.api.nvim_create_augroup("ofseed", {})
 local custom = require("customization")
 
@@ -63,30 +64,30 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-function ColorMyPencils()
-    vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none", ctermbg="NONE" })
-    vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE", ctermbg = "NONE" })
-    vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE", ctermbg = "NONE" })
-    -- etc...
-end
+-- function ColorMyPencils()
+--     vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
+--     vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none", ctermbg="NONE" })
+--     vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE", ctermbg = "NONE" })
+--     vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE", ctermbg = "NONE" })
+--     -- etc...
+-- end
 
-vim.api.nvim_create_augroup("nobg", { clear = true })
-vim.api.nvim_create_autocmd({ "ColorScheme" }, {
-  desc = "Make all backgrounds transparent",
-  group = "nobg",
-  pattern = "*",
-  callback = ColorMyPencils,
-})
+-- vim.api.nvim_create_augroup("nobg", { clear = true })
+-- vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+--   desc = "Make all backgrounds transparent",
+--   group = "nobg",
+--   pattern = "*",
+--   callback = ColorMyPencils,
+-- })
 
 -- autocmd to change kitty padding
-vim.cmd [[
-augroup kitty_mp
-    autocmd!
-    au VimLeave * :silent !kitty @ set-spacing padding=20 margin=10
-    au VimEnter * :silent !kitty @ set-spacing padding=0 margin=0
-augroup END
-]]
+-- vim.cmd [[
+-- augroup kitty_mp
+--     autocmd!
+--     au VimLeave * :silent !kitty @ set-spacing padding=20 margin=10
+--     au VimEnter * :silent !kitty @ set-spacing padding=0 margin=0
+-- augroup END
+-- ]]
 
 local kitty_group = vim.api.nvim_create_augroup("kitty_mp", {})
 
@@ -118,7 +119,7 @@ local function get_neotree_winid()
   return nil
 end
 
-vim.api.nvim_create_autocmd({"VimResized", "WinResized"}, {
+vim.api.nvim_create_autocmd({ "VimResized", "WinResized" }, {
   pattern = "*",
   desc = "Update neotree size",
   callback = function()
@@ -136,11 +137,44 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- local debug_group = vim.api.nvim_create_augroup("debug", {})
--- vim.api.nvim_create_autocmd({"BufWinEnter", "WinEnter"}, {
---   group = debug_group,
---   pattern = "*",
+local texgroup = vim.api.nvim_create_augroup("Tex", {})
+
+-- Remaps ; to \ and \ to ; in tex files
+vim.api.nvim_create_autocmd("FileType", {
+  group = texgroup,
+  pattern = { "tex", "latex" },
+  callback = M.remap_tex,
+})
+
+-- Disable copilot for certain filetypes
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = {"python"},
 --   callback = function()
---     print("Win Resized")
+--     vim.cmd("Copilot disable")
 --   end,
 -- })
+
+-- Disable treesiter for latex files
+-- vim.api.nvim_create_autocmd("FileType", {
+--   group = texgroup,
+--   pattern = {"tex", "latex"},
+--   callback = function()
+--     vim.cmd("TSBufDisable")
+--   end,
+-- })
+
+
+vim.api.nvim_create_user_command("ConvertToTex", function()
+  local filepath = vim.api.nvim_buf_get_name(0)
+  if filepath:match("%.ipynb$") or filepath:match("%.py$") then
+    require("customization").ipynb_to_tex(filepath)
+  end
+end, {})
+
+vim.api.nvim_create_user_command("CreateIpynb", function(opts)
+  local filepath = vim.fn.expand("%:p:h") .. "/" .. opts.args .. ".ipynb"
+  if filepath:match("%.ipynb$") then
+    require("customization").create_notebook(filepath)
+  end
+  vim.cmd("e " .. filepath)
+end, {nargs = 1})

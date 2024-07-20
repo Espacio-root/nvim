@@ -33,7 +33,7 @@ return {
     })
   end,
   opts = {
-    close_if_last_window = false,
+    close_if_last_window = true,
     default_source = "last",
     popup_border_style = custom.border,
     default_component_configs = {

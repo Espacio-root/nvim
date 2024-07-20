@@ -67,21 +67,46 @@ return {
         end,
       },
       mapping = {
-        ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
-        ["<C-n>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
-        ["<M-n>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
-        ["<M-p>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
+        ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
+        ["<C-b>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
         ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
         ["<C-e>"] = cmp.mapping {
           i = cmp.mapping.close(),
           c = cmp.mapping.close(),
         },
         ["<CR>"] = cmp.mapping.confirm { select = true },
+        ["<C-n>"] = cmp.mapping(function(fallback)
+          if luasnip.choice_active() then
+            luasnip.change_choice(1)
+          elseif cmp.visible() then
+            cmp.select_next_item()
+          else
+            fallback()
+          end
+        end, {
+          "i",
+          "s",
+          "c",
+        }),
+
+        ["<C-p>"] = cmp.mapping(function(fallback)
+          if luasnip.choice_active() then
+            luasnip.change_choice(-1)
+          elseif cmp.visible() then
+            cmp.select_prev_item()
+          else
+            fallback()
+          end
+        end, {
+          "i",
+          "s",
+          "c",
+        }),
         ["<Tab>"] = cmp.mapping(function(fallback)
-          -- if cmp.visible() then
-          --   cmp.select_next_item()
           if luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()
+          elseif cmp.visible() then
+            cmp.select_next_item()
           -- elseif has_words_before() then
           --   cmp.complete()
           else
@@ -93,10 +118,10 @@ return {
           "c",
         }),
         ["<S-Tab>"] = cmp.mapping(function(fallback)
-          -- if cmp.visible() then
-          --   cmp.select_prev_item()
           if luasnip.jumpable(-1) then
             luasnip.jump(-1)
+          elseif cmp.visible() then
+            cmp.select_prev_item()
           else
             fallback()
           end
@@ -113,6 +138,9 @@ return {
           name = "buffer",
           option = {
             get_bufnrs = function()
+              if vim.api.nvim_buf_get_option(vim.api.nvim_get_current_buf(), "filetype") == "tex" then
+                return {}
+              end
               local bufs = {}
               for _, win in ipairs(vim.api.nvim_list_wins()) do
                 bufs[vim.api.nvim_win_get_buf(win)] = true

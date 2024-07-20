@@ -1,3 +1,22 @@
+local untrigger = function()
+  -- get the snippet
+  local snip = require("luasnip").session.current_nodes[vim.api.nvim_get_current_buf()].parent.snippet
+  -- get its trigger
+  local trig = snip.trigger
+  -- replace that region with the trigger
+  local node_from, node_to = snip.mark:pos_begin_end_raw()
+  vim.api.nvim_buf_set_text(
+    0,
+    node_from[1],
+    node_from[2],
+    node_to[1],
+    node_to[2],
+    { trig }
+  )
+  -- reset the cursor-position to ahead the trigger
+  vim.fn.setpos(".", { 0, node_from[1] + 1, node_from[2] + 1 + string.len(trig) })
+end
+
 return {
   "L3MON4D3/LuaSnip",
   event = {
@@ -19,28 +38,28 @@ return {
       update_events = { "TextChanged", "TextChangedI" },
       enable_autosnippets = true,
       delete_check_events = "TextChanged",
-      -- ext_opts = {
-      --   [types.choiceNode] = {
-      --     active = {
-      --       virt_text = { { "●", "Operator" } },
-      --       virt_text_pos = "inline",
-      --     },
-      --     unvisited = {
-      --       virt_text = { { "●", "Comment" } },
-      --       virt_text_pos = "inline",
-      --     },
-      --   },
-      --   [types.insertNode] = {
-      --     active = {
-      --       virt_text = { { "●", "Keyword" } },
-      --       virt_text_pos = "inline",
-      --     },
-      --     unvisited = {
-      --       virt_text = { { "●", "Comment" } },
-      --       virt_text_pos = "inline",
-      --     },
-      --   },
-      -- },
+      ext_opts = {
+        [types.choiceNode] = {
+          active = {
+            virt_text = { { "●", "Operator" } },
+            virt_text_pos = "inline",
+          },
+          unvisited = {
+            virt_text = { { "●", "Comment" } },
+            virt_text_pos = "inline",
+          },
+        },
+        [types.insertNode] = {
+          active = {
+            virt_text = { { "●", "Keyword" } },
+            virt_text_pos = "inline",
+          },
+          unvisited = {
+            virt_text = { { "●", "Comment" } },
+            virt_text_pos = "inline",
+          },
+        },
+      },
       snip_env = {
         -- Same with text node, used for function nodes
         text_same_with = function(args)
@@ -73,6 +92,17 @@ return {
             i(1, args[1][1] .. user_arg1),
           })
         end,
+
+        insert_copy_from_clipboard = function()
+          local reg = vim.fn.getreg "+"
+          local text = {}
+          for line in reg:gmatch "[^\n]+" do
+            table.insert(text, line)
+          end
+          return sn(nil, {
+            i(1, text),
+          })
+        end,
       },
     }
 
@@ -92,5 +122,11 @@ return {
   keys = {
     { "<C-n>", "<Plug>luasnip-next-choice", mode = {"i", "s"} },
     { "<C-p>", "<Plug>luasnip-prev-choice", mode = {"i", "s"} },
+    { "<C-x>", function()
+        if require("luasnip").in_snippet() then
+          untrigger()
+          require("luasnip").unlink_current()
+        end
+    end, desc = "Undo a snippet", mode = {"i", "s"} }
   }
 }

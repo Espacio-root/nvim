@@ -4,6 +4,7 @@ return {
 		Lua = {
 			diagnostics = {
 				globals = { "vim" },
+				disable = { "undefined-global" },
 			},
 			workspace = {
 				library = {

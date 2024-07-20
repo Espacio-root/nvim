@@ -3,6 +3,7 @@ local opts = { mode = "n", silent = "true", noremap = "true" }
 return {
   "jackMort/ChatGPT.nvim",
   event = "VeryLazy",
+  enabled = false,
   config = function()
     require("chatgpt").setup()
   end,

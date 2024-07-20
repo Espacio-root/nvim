@@ -31,9 +31,9 @@ vim.opt.title = true
 vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 vim.opt.conceallevel = 2
-vim.opt.scrolloff = 2
+vim.opt.scrolloff = 4
 vim.opt.sidescrolloff = 5
-vim.opt.smoothscroll = true
+-- vim.opt.smoothscroll = true
 vim.opt.pumblend = 12
 vim.opt.pumheight = 12
 vim.opt.guifont = "Cascadia Code PL:h14"
@@ -45,3 +45,8 @@ vim.opt.fillchars = {
   foldclose = "",
   foldsep = "▕",
 }
+
+-- Jukit
+vim.g.jukit_mappings = 0
+vim.g.jukit_output_new_os_window = 1
+vim.g.jukit_outhist_new_os_window = 1

@@ -5,9 +5,6 @@ return {
   init = function()
     -- VimTeX configuration goes here, e.g.
     vim.g.vimtex_view_method = "zathura"
-    vim.g.tex_flavour = "latex"
     vim.g.vimtex_quickfix_mode = 0
-    vim.g.tex_conceal = "abdmg"
-    vim.cmd[[set conceallevel=2]]
-  end
+  end,
 }
