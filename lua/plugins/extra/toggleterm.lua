@@ -40,7 +40,7 @@ return {
       local bufnr = t.bufnr
       vim.keymap.set("t", "<Esc>", "<C-\\><C-N>", { buffer = bufnr })
     end,
-    shell = vim.uv.os_uname().sysname == "Windows_NT" and "pwsh" or "bash",
+    shell = vim.uv.os_uname().sysname == "Windows_NT" and "pwsh" or custom.shell,
     float_opts = {
       border = custom.border,
     },

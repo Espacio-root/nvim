@@ -5,5 +5,19 @@ return {
   cmd = {
     "PasteImage",
   },
-  opts = {},
+  opts = {
+    filetypes = {
+      tex = {
+        relative_template_path = false, ---@type boolean
+        template = [[
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{$FILE_PATH}
+  \caption{$CURSOR}
+  \label{fig:$LABEL}
+\end{figure}
+    ]], ---@type string
+      }
+    }
+  },
 }

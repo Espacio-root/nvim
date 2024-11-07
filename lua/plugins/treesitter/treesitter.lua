@@ -9,6 +9,7 @@ end
 return {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
+  commit = "3826d0c42ac635f560479b5b6ab522f6627a3466",
   config = function()
     require("nvim-treesitter.configs").setup {
       ensure_installed = "all",

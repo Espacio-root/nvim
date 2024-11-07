@@ -2,6 +2,7 @@ local opts = { mode = "n", silent = "true", noremap = "true" }
 
 return {
   "CopilotC-Nvim/CopilotChat.nvim",
+  enabled = false,
   branch = "canary",
   dependencies = {
     { "zbirenbaum/copilot.lua" },   -- or github/copilot.vim

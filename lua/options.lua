@@ -4,8 +4,8 @@ vim.opt.exrc = true
 
 -- Edit
 vim.opt.expandtab = true
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
 vim.opt.undofile = true
 vim.opt.swapfile = false
 vim.opt.ignorecase = true
@@ -47,6 +47,8 @@ vim.opt.fillchars = {
 }
 
 -- Jukit
-vim.g.jukit_mappings = 0
+-- vim.g.jukit_mappings = 0
 vim.g.jukit_output_new_os_window = 1
 vim.g.jukit_outhist_new_os_window = 1
+vim.g.jukit_convert_open_default = 0
+-- vim.g.jukit_terminal = "nvimterm"

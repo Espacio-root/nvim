@@ -168,12 +168,14 @@ local compl = s(
 
 local td = s(
   { trig = "td", dsrc = "superscript", wordTrig = false, snippetType = "autosnippet", },
-  fmta([[^{<power>}<after>]], { power = i(1), after = i(0) })
+  fmta([[^{<power>}<after>]], { power = i(1), after = i(0) }),
+  { condition = in_mathzone }
 )
 
 local us = s(
   { trig = "us", dsrc = "underscript", wordTrig = false, snippetType = "autosnippet", },
-  fmta([[_{<power>}<after>]], { power = i(1), after = i(0) })
+  fmta([[_{<power>}<after>]], { power = i(1), after = i(0) }),
+  { condition = in_mathzone }
 )
 
 local frac1 = s(
@@ -184,7 +186,6 @@ local frac1 = s(
     num = i(1),
     den = i(2),
   })
--- { condition = in_mathzone }
 )
 
 local frac2 = s(
@@ -402,7 +403,7 @@ local rec_ali
 rec_ali = function()
   return sn(
     nil,
-    { c(1, {t(""), t(" \\nonumber"), sn(nil, { t(" \\label{eq:"), i(1), t("} "), t("\\tag{"), f(last_num, 1), t("}") }) }),
+    { c(1, { t(""), t(" \\nonumber"), sn(nil, { t(" \\label{eq:"), i(1), t("} "), t("\\tag{"), f(last_num, 1), t("}") }) }),
       c(2, {
         -- Order is important, sn(...) first would cause infinite loop of expansion.
         t(""),
@@ -411,8 +412,8 @@ rec_ali = function()
   )
 end
 
-local align = s(
-  { trig = "aln", dsrc = "align", snippetType = "autosnippet" },
+local align1 = s(
+  { trig = "aln ", dsrc = "align - type 1", snippetType = "autosnippet" },
   fmta([[
   \begin{align}
     & <content><continue>
@@ -420,6 +421,30 @@ local align = s(
   ]], {
     content = i(1),
     continue = d(2, rec_ali, {}),
+    after = i(0)
+  })
+)
+
+local rec_ali2
+rec_ali2 = function()
+  return sn(
+    nil,
+    { c(1, {
+      t(""),
+      sn(nil, { t({ " \\\\", "  " }), i(1), d(2, rec_ali2, {}) }),
+    }) }
+  )
+end
+
+local align2 = s(
+  { trig = "aln* ", dsrc = "align - type 2", snippetType = "autosnippet" },
+  fmta([[
+  \begin{align*}
+    <content><continue>
+  \end{align*}<after>
+  ]], {
+    content = i(1),
+    continue = d(2, rec_ali2, {}),
     after = i(0)
   })
 )
@@ -462,6 +487,63 @@ local matrix2 = s(
   })
 )
 
+local augmented_matrix1 = s(
+  { trig = "amat(%d)(%d)", dsrc = "matrix - type 1", snippetType = "autosnippet", regTrig = true, condition = in_mathzone },
+  fmta([[
+  \left[ \begin{array}{<shape1>|<shape2>} <content> \end{array} \right]<after>
+  ]], {
+    shape1 = i(1),
+    shape2 = i(2),
+    content = d(3, function(_, snip) return gen_matrix(tonumber(snip.captures[1]), tonumber(snip.captures[2])) end, {}),
+    after = i(0)
+  })
+)
+
+local augmented_matrix2 = s(
+  { trig = "amat ", dsrc = "matrix - type 2", snippetType = "autosnippet", condition = in_mathzone },
+  fmta([[
+  \left[ \begin{array}{<shape1>|<shape2>} <content> \end{array} \right]<after>
+  ]], {
+    shape1 = i(1),
+    shape2 = i(2),
+    content = i(3),
+    after = i(0)
+  })
+)
+
+local gen_vector = function(dim, sign)
+  local tbl = {}
+  for n = 1, dim do
+    table.insert(tbl, i(n))
+    if n ~= dim then
+      table.insert(tbl, t(" " .. sign .. " "))
+    end
+  end
+  table.insert(tbl, t(""))
+  return sn(nil, tbl)
+end
+
+local row_vector = s(
+  { trig = "rvec(%d)", dsrc = "row vector", snippetType = "autosnippet", regTrig = true, condition = in_mathzone },
+  fmta([[
+  \begin{bmatrix} <content> \end{bmatrix}<after>
+  ]], {
+    content = d(1, function(_, snip) return gen_vector(tonumber(snip.captures[1]), "&") end, {}),
+    after = i(0)
+  })
+)
+
+local col_vector = s(
+  { trig = "cvec(%d)", dsrc = "column vector", snippetType = "autosnippet", regTrig = true, condition = in_mathzone },
+  fmta([[
+  \begin{bmatrix} <content> \end{bmatrix}<after>
+  ]], {
+    content = d(1, function(_, snip) return gen_vector(tonumber(snip.captures[1]), "\\\\") end, {}),
+    after = i(0)
+  })
+)
+
+
 local rec_enum
 rec_enum = function()
   return sn(
@@ -494,14 +576,14 @@ local item = s(
     \item <content><cont>
   \end{itemize}<after>
   ]], {
-    content = i(1),
+    content = d(1, insert_copy_from_clipboard),
     cont = d(2, rec_enum, {}),
     after = i(0)
   })
 )
 
 local note = s(
-  { trig = "nt", dsrc = "note", snippetType = "autosnippet" },
+  { trig = "note", dsrc = "note", snippetType = "autosnippet" },
   fmta([[
   \begin{note}
     <content>
@@ -633,6 +715,11 @@ local binom = s(
   ]], { n = i(1), k = i(2), after = i(0) })
 )
 
+local rightarrow = s(
+  {trig = "->", dsrc = "rightarrow", snippetType = "autosnippet", condition = in_mathzone},
+  {t("\\rightarrow")}
+)
+
 return {
   sign, box, beg,
   mk, dm,
@@ -641,11 +728,12 @@ return {
   frac1, frac2, frac3,
   sympy1, sympy2,
   bar1, bar2, hat1, hat2, vec,
-  eqn, align, enum, item, note, brackets,
+  eqn, align1, align2, enum, item, note, brackets,
   sum, lim, derivative, i1, i2,
   math1, math2,
   definition, subsection, subsection2,
   beta1, beta2, transpose, text,
   cdot, binom,
-  matrix1, matrix2,
+  matrix1, matrix2, augmented_matrix1, augmented_matrix2, row_vector, col_vector,
+  rightarrow,
 }

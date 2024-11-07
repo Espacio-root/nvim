@@ -1,9 +1,10 @@
 local M = {}
 
 -- M.theme = "kanagawa-dragon"
-M.theme = "catppuccin"
+M.theme = "kanagawa"
 M.prefer_tabpage = false
 M.border = "rounded"
+M.shell = "fish"
 
 M.width = function()
   local min_width = 25

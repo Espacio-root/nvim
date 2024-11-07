@@ -2,10 +2,13 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ";"
 
 -- convenient pastes
--- vim.keymap.set("n", "p", "\"0p", { noremap = true })
+vim.keymap.set("n", "p", "\"0p", { noremap = true })
 
--- delete copies to 1st register
+-- d copies to 1st register
 vim.keymap.set({"n", "v"}, "d", "\"1d", { noremap = true })
+
+-- x copies to 0th register
+vim.keymap.set({"n", "v"}, "x", "\"0x", { noremap = true })
 
 -- move through windows
 vim.keymap.set("n", "<C-h>", function() vim.cmd("wincmd h") end, { noremap = true, silent = true })

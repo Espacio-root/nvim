@@ -11,13 +11,15 @@ local servers = {
 	"lua_ls",
 	"cssls",
 	"html",
-	"pyright",
+	-- "pyright",
+	"jedi_language_server",
 	"bashls",
 	"jsonls",
 	"yamlls",
 	"tailwindcss",
 	"rust_analyzer",
-	"clangd"
+	"clangd",
+	"jdtls"
 }
 
 M.servers = servers

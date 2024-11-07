@@ -86,6 +86,35 @@ return {
         end,
       },
     }
+
+    dap.configurations.cpp = {
+      {
+        name = "Launch",
+        type = "lldb",
+        request = "launch",
+        program = function()
+          local file = vim.fn.expand('%:p')
+          local dir = vim.fn.fnamemodify(file, ':h')
+          local executable = dir .. '/' .. vim.fn.fnamemodify(file, ':t:r')
+          if vim.fn.filereadable(executable) == 1 then
+            return executable
+          else
+            local compile = vim.fn.input(string.format("Executable not found at %s. Would you like to compile it? (y/n) ", executable), "", "file")
+            if compile:lower() == 'y' then
+              local compile_command = vim.fn.input("Enter the compile command: ", "g++ -g -o " .. executable .. " " .. file, "shell")
+              vim.cmd("!" .. compile_command)
+              return executable
+            else
+              return nil
+            end
+          end
+        end,
+        cwd = "${workspaceFolder}",
+        stopOnEntry = false,
+        args = {},
+      },
+    }
+
   end,
   keys = {
     {

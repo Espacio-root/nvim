@@ -1,6 +1,6 @@
 local M = require("keymaps")
-local group = vim.api.nvim_create_augroup("ofseed", {})
 local custom = require("customization")
+local group = vim.api.nvim_create_augroup("ofseed", {})
 
 ---@param scope "global" | "local"
 local function set_breakindentopt(scope)
@@ -10,6 +10,7 @@ local function set_breakindentopt(scope)
   end
   vim.api.nvim_set_option_value("breakindentopt", "shift:" .. indent, { scope = scope })
 end
+
 set_breakindentopt "global"
 vim.api.nvim_create_autocmd({ "OptionSet" }, {
   group = group,
@@ -89,23 +90,43 @@ vim.api.nvim_create_autocmd("FileType", {
 -- augroup END
 -- ]]
 
-local kitty_group = vim.api.nvim_create_augroup("kitty_mp", {})
+-- local kitty_group = vim.api.nvim_create_augroup("kitty_mp", {})
+--
+-- vim.api.nvim_create_autocmd("VimEnter", {
+--   group = kitty_group,
+--   pattern = "*",
+--   desc = "Set kitty padding",
+--   callback = function()
+--     vim.fn.system("kitty @ set-spacing padding=5")
+--   end,
+-- })
+--
+-- vim.api.nvim_create_autocmd("VimLeave", {
+--   group = kitty_group,
+--   pattern = "*",
+--   desc = "Set kitty padding",
+--   callback = function()
+--     vim.fn.system("kitty @ set-spacing padding=20")
+--   end,
+-- })
+
+local uv = vim.loop
+
+local function set_kitty_spacing(padding, margin)
+  uv.spawn('kitty', {
+    args = {'@', 'set-spacing', 'padding='..padding, 'margin='..margin},
+  }, function() end)
+end
 
 vim.api.nvim_create_autocmd("VimEnter", {
-  group = kitty_group,
-  pattern = "*",
-  desc = "Set kitty padding",
   callback = function()
-    vim.fn.system("kitty @ set-spacing padding=5")
+    set_kitty_spacing(0, 0)
   end,
 })
 
 vim.api.nvim_create_autocmd("VimLeave", {
-  group = kitty_group,
-  pattern = "*",
-  desc = "Set kitty padding",
   callback = function()
-    vim.fn.system("kitty @ set-spacing padding=20")
+    set_kitty_spacing(20, 10)
   end,
 })
 
