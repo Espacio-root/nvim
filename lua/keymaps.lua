@@ -21,6 +21,21 @@ vim.keymap.set("n", "<C-l>", function() vim.cmd("wincmd l") end, { noremap = tru
 vim.keymap.set("n", "<C-j>", function() vim.cmd("wincmd j") end, { noremap = true, silent = true })
 vim.keymap.set("n", "<C-k>", function() vim.cmd("wincmd k") end, { noremap = true, silent = true })
 
+-- arduino shortcuts
+vim.keymap.set("n", "<leader>au", function()
+    local sketch_path = vim.fn.expand("%:p:h")  -- Get the current file's directory
+    local fqbn = "arduino:avr:uno"             -- Replace with your board's FQBN
+    local port = "/dev/ttyUSB0"                -- Replace with your board's port
+
+    local compile_upload_cmd = string.format(
+        "arduino-cli compile --fqbn %s --upload -p %s %s",
+        fqbn, port, sketch_path
+    )
+
+    -- Run the command in a terminal
+    vim.cmd(string.format("terminal %s", compile_upload_cmd))
+end, { desc = "Compile and upload Arduino sketch", silent = true })
+
 M.lsp_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true }
   local keymap = vim.api.nvim_buf_set_keymap
