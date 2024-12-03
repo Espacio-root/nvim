@@ -7,6 +7,7 @@ return {
     local lspconfig = require("lspconfig")
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
+    
     local servers = {
       "lua_ls",
       "pyright",
@@ -19,6 +20,7 @@ return {
       "rust_analyzer",
       "clangd",
       "jdtls",
+      -- "arduino_language_server",
     }
 
     local on_attach = function(client, bufnr)
@@ -44,7 +46,7 @@ return {
     })
 
     for _, server in pairs(servers) do
-      opts = {
+      local opts = {
         on_attach = on_attach,
         capabilities = capabilities
       }

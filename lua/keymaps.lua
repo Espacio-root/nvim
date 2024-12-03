@@ -1,19 +1,21 @@
+local helper = require("helper")
+
 local M = {}
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = ";"
 
 -- x copies to 0th register
-vim.keymap.set({ "n", "v" }, "x", "\"0x", { noremap = true })
-vim.keymap.set({ "n", "v" }, "X", "\"0X", { noremap = true })
+vim.keymap.set({ "n", "x" }, "x", "\"0x", { noremap = true })
+vim.keymap.set({ "n", "x" }, "X", "\"0X", { noremap = true })
 
 -- global copy/pastes
-vim.keymap.set({ "n", "v" }, "gy", "\"+y", { noremap = true })
-vim.keymap.set({ "n", "v" }, "gp", "\"+p", { noremap = true })
+vim.keymap.set({ "n", "x" }, "gy", "\"+y", { noremap = true })
+vim.keymap.set({ "n", "x" }, "gp", "\"+p", { noremap = true })
 
 -- pastes don't overwrite default register
-vim.keymap.set({ "n", "v" }, "p", '"0p', { noremap = true }) -- for pasting after cursor
-vim.keymap.set({ "n", "v" }, "P", '"0P', { noremap = true }) -- for pasting before cursor
+vim.keymap.set({ "n", "x" }, "p", '"0p', { noremap = true }) -- for pasting after cursor
+vim.keymap.set({ "n", "x" }, "P", '"0P', { noremap = true }) -- for pasting before cursor
 
 -- move through windows
 vim.keymap.set("n", "<C-h>", function() vim.cmd("wincmd h") end, { noremap = true, silent = true })
@@ -21,20 +23,8 @@ vim.keymap.set("n", "<C-l>", function() vim.cmd("wincmd l") end, { noremap = tru
 vim.keymap.set("n", "<C-j>", function() vim.cmd("wincmd j") end, { noremap = true, silent = true })
 vim.keymap.set("n", "<C-k>", function() vim.cmd("wincmd k") end, { noremap = true, silent = true })
 
--- arduino shortcuts
-vim.keymap.set("n", "<leader>au", function()
-    local sketch_path = vim.fn.expand("%:p:h")  -- Get the current file's directory
-    local fqbn = "arduino:avr:uno"             -- Replace with your board's FQBN
-    local port = "/dev/ttyUSB0"                -- Replace with your board's port
+vim.keymap.set("n", "<leader>au", helper.arduino_compile, { desc = "Compile and upload Arduino sketch", silent = true })
 
-    local compile_upload_cmd = string.format(
-        "arduino-cli compile --fqbn %s --upload -p %s %s",
-        fqbn, port, sketch_path
-    )
-
-    -- Run the command in a terminal
-    vim.cmd(string.format("terminal %s", compile_upload_cmd))
-end, { desc = "Compile and upload Arduino sketch", silent = true })
 
 M.lsp_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true }
@@ -50,16 +40,18 @@ M.lsp_keymaps = function(bufnr)
 
   keymap(bufnr, "n", "<leader>ld", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)        -- Show diagnostics in float
   keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)          -- Code actions
-  keymap(bufnr, "n", "<leader>ln", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)               -- Rename symbol
+  keymap(bufnr, "n", "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)               -- Rename symbol
   keymap(bufnr, "n", "<leader>lh", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)       -- Show signature help
   keymap(bufnr, "n", "<leader>lf", "<cmd>lua vim.lsp.buf.format{ async = true }<CR>", opts) -- Format buffer
   keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<CR>", opts)                                -- Show LSP info
   keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)                         -- Show hover docs
 end
 
+
 M.files = {
-  { "<leader>e", function() require("mini.files").open() end, mode = { "n", "v" }, desc = "file tree" }
+  { "<leader>e", function() require("mini.files").open() end, mode = { "n", "x" }, desc = "file tree" }
 }
+
 
 M.luaSnip = {
   { "<C-n>", "<Plug>luasnip-next-choice", mode = { "i", "s" } },
@@ -76,6 +68,7 @@ M.luaSnip = {
     mode = { "i", "s" }
   }
 }
+
 
 M.fzf = {
   { "<leader>ff",  function() require("fzf-lua").files() end,                 desc = "Files", },
@@ -95,6 +88,7 @@ M.fzf = {
   { "<leader>fgb", function() require("fzf-lua").git_branchs() end,           desc = "Branchs", },
   { "<leader>fgt", function() require("fzf-lua").git_tags() end,              desc = "Tags", },
 }
+
 
 M.bufferline = {
   { "<M-1>",       "<Cmd>BufferLineGoToBuffer 1<CR>",    desc = "Go to buffer 1" },
@@ -120,6 +114,7 @@ M.bufferline = {
   { "<leader>bst", "<cmd>BufferLineSortByTabs<CR>",      desc = "By tabs" },
 }
 
+
 local execute_with_venv = function(default_cmd, fallback_cmd)
   local venv = require('venv-selector').get_active_venv()
   if venv == nil then
@@ -131,14 +126,34 @@ local execute_with_venv = function(default_cmd, fallback_cmd)
   end
 end
 
+
 M.jukit = {
   { "<leader>os",  function() execute_with_venv("JukitOut conda activate ", "call jukit#splits#output()") end,                 noremap = true, mode = "n",    ft = filetypes },
   { "<leader>ohs", function() execute_with_venv("JukitOutHist conda activate ", "call jukit#splits#output_and_history()") end, noremap = true, silent = true, mode = "n",    ft = filetypes },
 }
 
+
 M.undotree = {
-  { "<leader>u", vim.cmd.UndotreeToggle, mode = { "n", "v" }, desc = "toggle undotree" }
+  { "<leader>u", vim.cmd.UndotreeToggle, mode = { "n", "x" }, desc = "toggle undotree" }
 }
+
+
+local function toggle_quickfix()
+  local wins = vim.fn.getwininfo()
+  local qf_win = vim
+      .iter(wins)
+      :filter(function(win)
+        return win.quickfix == 1
+      end)
+      :totable()
+  if #qf_win == 0 then
+    vim.cmd.copen()
+  else
+    vim.cmd.cclose()
+  end
+end
+
+vim.keymap.set("n", "<leader>q", toggle_quickfix, { desc = "Quickfix" })
 
 
 return M
