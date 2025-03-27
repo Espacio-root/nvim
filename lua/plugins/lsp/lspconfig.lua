@@ -7,7 +7,6 @@ return {
     local lspconfig = require("lspconfig")
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-    
     local servers = {
       "lua_ls",
       "pyright",
@@ -20,6 +19,7 @@ return {
       "rust_analyzer",
       "clangd",
       "jdtls",
+      "ts_ls",
       -- "arduino_language_server",
     }
 

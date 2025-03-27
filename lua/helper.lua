@@ -1,9 +1,9 @@
 local M = {}
 
 M.arduino_compile = function()
-  local sketch_path = vim.fn.expand("%:p:h")   -- Get the current file's directory
-  local fqbn = "arduino:avr:uno"               -- Replace with your board's FQBN
-  local port = "/dev/ttyUSB0"                  -- Replace with your board's port
+  local sketch_path = vim.fn.expand("%:p:h") -- Get the current file's directory
+  local fqbn = "arduino:avr:uno"             -- Replace with your board's FQBN
+  local port = "/dev/ttyUSB0"                -- Replace with your board's port
   local compile_upload_cmd = string.format(
     "arduino-cli compile --fqbn %s --upload -p %s %s",
     fqbn, port, sketch_path

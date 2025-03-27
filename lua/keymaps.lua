@@ -17,6 +17,15 @@ vim.keymap.set({ "n", "x" }, "gp", "\"+p", { noremap = true })
 vim.keymap.set({ "n", "x" }, "p", '"0p', { noremap = true }) -- for pasting after cursor
 vim.keymap.set({ "n", "x" }, "P", '"0P', { noremap = true }) -- for pasting before cursor
 
+-- remove highlights
+vim.keymap.set("n", '<Esc><Esc>', ':nohlsearch<CR>', { silent = true })
+
+-- conveninent vertical traversal
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "<C-f>", "<C-f>zz")
+vim.keymap.set("n", "<C-b>", "<C-b>zz")
+
 -- move through windows
 vim.keymap.set("n", "<C-h>", function() vim.cmd("wincmd h") end, { noremap = true, silent = true })
 vim.keymap.set("n", "<C-l>", function() vim.cmd("wincmd l") end, { noremap = true, silent = true })
@@ -46,6 +55,25 @@ M.lsp_keymaps = function(bufnr)
   keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<CR>", opts)                                -- Show LSP info
   keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)                         -- Show hover docs
 end
+
+
+M.copilot = {
+  suggestion = {
+    accept = "<C-f>",
+    accept_word = false,
+    accept_line = false,
+    next = "<C-]>",
+    prev = "<C-\\>",
+    dismiss = "<M-[>",
+  },
+  panel = {
+    jump_prev = "[[",
+    jump_next = "]]",
+    accept = "<C-f>",
+    refresh = "gr",
+    open = "<M-CR>"
+  }
+}
 
 
 M.files = {
@@ -84,6 +112,7 @@ M.fzf = {
   { "<leader>fw",  function() require("fzf-lua").live_grep_native() end,      desc = "Live grep", },
 
   -- git
+  { "<leader>fgf", function() require("fzf-lua").git_files() end,             desc = "Commits", },
   { "<leader>fgc", function() require("fzf-lua").git_commits() end,           desc = "Commits", },
   { "<leader>fgb", function() require("fzf-lua").git_branchs() end,           desc = "Branchs", },
   { "<leader>fgt", function() require("fzf-lua").git_tags() end,              desc = "Tags", },
@@ -115,26 +144,13 @@ M.bufferline = {
 }
 
 
-local execute_with_venv = function(default_cmd, fallback_cmd)
-  local venv = require('venv-selector').get_active_venv()
-  if venv == nil then
-    vim.cmd(fallback_cmd)
-  else
-    local venv_parts = vim.split(venv, "/")
-    local venv_name = venv_parts[#venv_parts]
-    vim.cmd(default_cmd .. venv_name)
-  end
-end
-
-
-M.jukit = {
-  { "<leader>os",  function() execute_with_venv("JukitOut conda activate ", "call jukit#splits#output()") end,                 noremap = true, mode = "n",    ft = filetypes },
-  { "<leader>ohs", function() execute_with_venv("JukitOutHist conda activate ", "call jukit#splits#output_and_history()") end, noremap = true, silent = true, mode = "n",    ft = filetypes },
-}
-
-
 M.undotree = {
   { "<leader>u", vim.cmd.UndotreeToggle, mode = { "n", "x" }, desc = "toggle undotree" }
+}
+
+M.jukit = {
+  { "<leader>os", "<cmd>JukitOut nix-shell ~/mlearning/shell.nix<cr>", noremap = true, mode = "n",    ft = filetypes },
+  { "<leader>ohs", "<cmd>JukitOutHist nix-shell ~/mlearning/shell.nix<cr>", noremap = true, silent = true, mode = "n",    ft = filetypes },
 }
 
 
@@ -154,6 +170,26 @@ local function toggle_quickfix()
 end
 
 vim.keymap.set("n", "<leader>q", toggle_quickfix, { desc = "Quickfix" })
+
+-- File type specific keybinds
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "tex", "latex" },
+  callback = function()
+    -- Remap ; to \ for ease of use in latex
+    vim.keymap.set("i", ";", "\\", { noremap = true, silent = true })
+    -- Remap \ to ; for ease of use in latex
+    vim.keymap.set("i", "\\", ";", { noremap = true, silent = true })
+  end,
+})
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = { "python", "ipynb" },
+--   callback = function()
+--     vim.keymap.set("n", "<leader>os", "<cmd>JukitOut nix-shell ~/mlearning/shell.nix<cr>",
+--       { noremap = true, silent = true, buffer = true })
+--     vim.keymap.set("n", "<leader>ohs", "<cmd>JukitOutHist nix-shell ~/mlearning/shell.nix<cr>",
+--       { noremap = true, silent = true, buffer = true })
+--   end,
+-- })
 
 
 return M
