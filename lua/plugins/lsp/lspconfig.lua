@@ -7,21 +7,7 @@ return {
     local lspconfig = require("lspconfig")
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-    local servers = {
-      "lua_ls",
-      "pyright",
-      "html",
-      "cssls",
-      "bashls",
-      "jsonls",
-      "yamlls",
-      "tailwindcss",
-      "rust_analyzer",
-      "clangd",
-      "jdtls",
-      "ts_ls",
-      -- "arduino_language_server",
-    }
+    local servers = require("helper").servers
 
     local on_attach = function(client, bufnr)
       keys.lsp_keymaps(bufnr)
@@ -32,17 +18,25 @@ return {
     capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 
     lspconfig["arduino_language_server"].setup({
+      cmd = {
+        "arduino-language-server",
+        "-cli-config", "/home/espacio/.arduino15/arduino-cli.yaml",
+        "-fqbn", "arduino:avr:uno", -- <<< REPLACE this with your board if needed
+        "-cli", "/usr/bin/arduino-cli",
+        "-clangd", "/usr/bin/clangd",
+      },
       on_attach = function(client, bufnr)
-        client.server_capabilities.diagnosticProvider = {
-          documentProvider = {
-            syntaxErrors = false
-          },
-          workspaceProvider = false
-        }
-        vim.diagnostic.disable(bufnr)
+        -- OPTIONAL: your custom disable diagnostics
+        -- client.server_capabilities.diagnosticProvider = {
+        --   documentProvider = {
+        --     syntaxErrors = false,
+        --   },
+        --   workspaceProvider = false,
+        -- }
+        -- vim.diagnostic.disable(bufnr)
         keys.lsp_keymaps(bufnr)
       end,
-      capabilities = capabilities
+      capabilities = capabilities,
     })
 
     for _, server in pairs(servers) do

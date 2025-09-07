@@ -31,7 +31,7 @@ vim.opt.title = true
 vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 vim.opt.conceallevel = 2
-vim.opt.scrolloff = 4
+vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 5
 -- vim.opt.smoothscroll = true
 -- vim.opt.pumblend = 12
@@ -51,7 +51,7 @@ vim.opt.fillchars = {
 vim.g.jukit_output_new_os_window = 1
 vim.g.jukit_outhist_new_os_window = 1
 vim.g.jukit_convert_open_default = 0
--- vim.g.jukit_shell_cmd = 'nix-shell ~/mlearning/shell.nix --run \'ipython3'
+-- vim.g.jukit_shell_cmd = "conda run -n ml 'ipython3"
 -- vim.g.jukit_terminal = "nvimterm"
 
 -- VimTex

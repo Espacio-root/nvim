@@ -3,5 +3,5 @@ require "keymaps"
 require "autocmds"
 require "manager"
 
-vim.cmd('colorscheme base16-primer-dark')
--- vim.cmd('colorscheme base16-gruvbox-dark-hard')
+-- vim.cmd('colorscheme base16-primer-dark')
+vim.cmd('colorscheme base16-tokyo-night-storm')
