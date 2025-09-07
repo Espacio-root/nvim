@@ -217,7 +217,7 @@ local lca = s(
 int timer=0, l=ceil(log2(n));
 vi tin(n+1), tout(n+1);
 vvi up(n+1, vi(l+1));
-auto dfs=[&](auto& self, int u, int p)->void {
+auto dfsLca=[&](auto& self, int u, int p)->void {
     tin[u]=timer++;
     up[u][0]=p;
     for (int i=1; i<=l; i++) {
@@ -229,7 +229,7 @@ auto dfs=[&](auto& self, int u, int p)->void {
     }
     tout[u]=timer++;
 };
-dfs(dfs,1,1);
+dfsLca(dfsLca,1,1);
 
 auto is_ancestor=[&](int u, int v)->bool {
     return tin[u]<=tin[v] && tout[u]>=tout[v];
