@@ -248,6 +248,17 @@ auto lca=[&](int u, int v)->int {
     }, { delimiters = "^$" })
 )
 
+local ordered_set = s(
+    { trig = "ORDERED_SET", dsrc = "Ordered Set" },
+    fmta([[
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+  ]], {
+    }, { delimiters = "^$" })
+)
+
 
 return {
     template,
@@ -257,4 +268,5 @@ return {
     custom_hash,
     segtree,
     lca,
+    ordered_set
 }
