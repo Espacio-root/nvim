@@ -1,6 +1,10 @@
 local template = s(
     { trig = "temp", dsrc = "Competetive Programming Template" },
     fmta([[
+/**
+ *    author:  espacio
+ *    created: @time$
+**/
 #include <iostream>
 #include <cstdint>
 #include <vector>
@@ -32,9 +36,12 @@ int32_t main() {
     return 0;
 }
   ]], {
-        main = c(1, { t({ "int t; cin>>t;", "    while(t--)", "        " }), t("") }),
-        type = c(2, { t("int"), t("void"), t("bool"), t("ll"), t("string"), t("double"), t("long double"), t("pii") }),
-        cmd = d(3, function(args, _)
+        time = d(1, function()
+            return sn(nil, t(os.date("%d.%m.%Y %H:%M:%S")))
+        end),
+        main = c(2, { t({ "int t; cin>>t;", "    while(t--)", "        " }), t("") }),
+        type = c(3, { t("int"), t("void"), t("bool"), t("ll"), t("string"), t("double"), t("long double"), t("pii") }),
+        cmd = d(4, function(args, _)
             local snipText = args[1][1];
             if (snipText == "int" or snipText == "ll" or snipText == "double" or snipText == "long double" or snipText == "string") then
                 return sn(nil, { t("cout << solve() << endl;") })
@@ -45,7 +52,7 @@ int32_t main() {
             elseif (snipText == "pii") then
                 return sn(nil, { t("{auto [x,y] = solve(); cout << x << \" \" << y << endl;}") })
             end
-        end, { 2 }),
+        end, { 3 }),
         code = i(0)
     }, {
         delimiters = "@$"
@@ -55,26 +62,36 @@ int32_t main() {
 local sparse_table = s(
     { trig = "SPARSE_TABLE", dsrc = "Sparse Table Snippet" },
     fmta([[
-vi log(n+1); log[1]=0;
-for (int i=2; i<=n; i++) log[i]=log[i/2]+1;
-int k = log[m];
+struct SparseTable {
+    int n, K;
+    vi log;
+    vvi st;
 
-auto stfn = [](int x, int y) {
-    return ^main$;
-};
+    SparseTable(const vi &a) {
+        n = (int)a.size();
+        log.resize(n + 1);
+        log[1] = 0;
+        for (int i = 2; i <= n; i++)
+            log[i] = log[i/2] + 1;
 
-vvi st(k+1, vi(m)), sm(k+1, vi(m));
-st[0]=b;
-for (int i=1; (1<<i)<=m; i++) {
-    for (int j=0; j+(1<<i)<=m; j++) {
-        st[i][j] = stfn(st[i-1][j], st[i-1][ j+(1<<(i-1)) ]);
+        K = log[n];
+        st.assign(K+1, vi(n));
+
+        for (int i = 0; i < n; i++) st[0][i] = a[i];
+
+        for (int k = 1; k <= K; k++) {
+            for (int i = 0; i + (1<<k) <= n; i++) {
+                st[k][i] = max(st[k-1][i], st[k-1][i + (1<<(k-1))]);
+            }
+        }
     }
-}
 
-int i=log[r-l+1];
-int mx=stfn(st[i][l], st[i][r-(1<<i)+1]);
+    int query(int l, int r) { // 0-indexed, inclusive
+        int j = log[r-l+1];
+        return max(st[j][l], st[j][r - (1<<j) + 1]);
+    }
+};
   ]], {
-        main = i(0),
     }, { delimiters = "^$" })
 )
 

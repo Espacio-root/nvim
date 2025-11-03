@@ -149,8 +149,8 @@ M.undotree = {
 }
 
 M.jukit = {
-  { "<leader>os", "<cmd>JukitOut conda activate ml<cr>", noremap = true, mode = "n",    ft = filetypes },
-  { "<leader>ohs", "<cmd>JukitOutHist conda activate ml<cr>", noremap = true, silent = true, mode = "n",    ft = filetypes },
+  { "<leader>jo", "<cmd>JukitOut conda activate ml<cr>", noremap = true, mode = "n",    ft = filetypes },
+  { "<leader>jh", "<cmd>JukitOutHist conda activate ml<cr>", noremap = true, silent = true, mode = "n",    ft = filetypes },
 }
 
 

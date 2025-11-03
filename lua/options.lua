@@ -51,7 +51,7 @@ vim.opt.fillchars = {
 vim.g.jukit_output_new_os_window = 1
 vim.g.jukit_outhist_new_os_window = 1
 vim.g.jukit_convert_open_default = 0
--- vim.g.jukit_shell_cmd = "conda run -n ml 'ipython3"
+-- vim.g.jukit_shell_cmd = "conda run -n ml --no-capture-output ipython3"
 -- vim.g.jukit_terminal = "nvimterm"
 
 -- VimTex

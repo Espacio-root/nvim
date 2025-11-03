@@ -112,3 +112,21 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
 })
 
 
+
+-- e.g. in your init.lua or a small module loaded early
+local ft_set = { python = true, ipynb = true, rs = true, json = true }
+
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(args)
+    if ft_set[args.match] then
+      -- buffer-local map
+      vim.keymap.set("n", "<leader>os", function()
+        vim.cmd("JukitOut conda activate ml")
+      end, { buffer = args.buf, noremap = true, silent = true, desc = "Jukit: Out (conda ml)" })
+
+      vim.keymap.set("n", "<leader>ohs", function()
+        vim.cmd("JukitOutHist conda activate ml")
+      end, { buffer = args.buf, noremap = true, silent = true, desc = "Jukit: OutHist (conda ml)" })
+    end
+  end,
+})
