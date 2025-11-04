@@ -9,6 +9,9 @@ local template = s(
 #include <cstdint>
 #include <vector>
 
+/** small observations:
+**/
+
 using namespace std;
 
 #define int long long
