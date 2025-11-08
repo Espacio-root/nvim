@@ -9,9 +9,6 @@ local template = s(
 #include <cstdint>
 #include <vector>
 
-/** small observations:
-**/
-
 using namespace std;
 
 #define int long long
@@ -27,6 +24,9 @@ using vs = vector<string>; using vvs = vector<vs>;
 
 #define ff first
 #define ss second
+
+/** small observations:
+**/
 
 @type$ solve() {
     @code$
