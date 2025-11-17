@@ -18,11 +18,11 @@ M.servers = {
 
 M.arduino_compile = function()
     local sketch_path = vim.fn.expand("%:p:h") -- Get the current file's directory
-    local fqbn = "arduino:avr:uno"           -- Replace with your board's FQBN
+    local fqbn = "arduino:avr:nano:cpu=atmega328old"           -- Replace with your board's FQBN
     local port = "/dev/ttyUSB0"              -- Replace with your board's port
-    local compile_upload_cmd = string.format(
-        "arduino-cli compile --fqbn %s --upload -p %s %s",
-        fqbn, port, sketch_path
+    local full_cmd = string.format(
+        "arduino-cli compile --fqbn %s --upload -p %s %s && arduino-cli monitor -p %s",
+        fqbn, port, sketch_path, port
     )
 
     -- Create a new buffer
@@ -48,7 +48,7 @@ M.arduino_compile = function()
     })
 
     -- Run the command and capture output
-    vim.fn.termopen(compile_upload_cmd, {
+    vim.fn.termopen(full_cmd, {
         on_exit = function(_, exit_code)
             -- Optional: Add highlighting based on exit code
             if exit_code == 0 then
