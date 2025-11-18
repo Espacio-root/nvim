@@ -18,6 +18,7 @@ using pii = pair<int, int>;
 using pll = pair<long long, long long>;
 
 using vi = vector<int>; using vvi = vector<vi>;
+using vii = vector<pii>; using vvii = vector<vii>;
 using vb = vector<bool>; using vvb = vector<vb>;
 using vc = vector<char>; using vvc = vector<vc>;
 using vs = vector<string>; using vvs = vector<vs>;

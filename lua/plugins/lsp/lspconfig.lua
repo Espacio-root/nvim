@@ -4,54 +4,60 @@ return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   config = function()
-    local lspconfig = require("lspconfig")
-    local cmp_nvim_lsp = require("cmp_nvim_lsp")
-
     local servers = require("helper").servers
 
-    local on_attach = function(client, bufnr)
-      keys.lsp_keymaps(bufnr)
-    end
+    -- Set up LspAttach autocommand for keymaps (replaces on_attach)
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
+      callback = function(args)
+        local bufnr = args.buf
+        keys.lsp_keymaps(bufnr)
+      end,
+    })
 
+    -- Configure capabilities for nvim-cmp
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities.textDocument.completion.completionItem.snippetSupport = true
     capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 
-    lspconfig["arduino_language_server"].setup({
+    -- Configure Arduino Language Server
+    vim.lsp.config("arduino_language_server", {
       cmd = {
         "arduino-language-server",
         "-cli-config", "/home/espacio/.arduino15/arduino-cli.yaml",
-        "-fqbn", "arduino:avr:uno", -- <<< REPLACE this with your board if needed
+        "-fqbn", "arduino:avr:uno",
         "-cli", "/usr/bin/arduino-cli",
         "-clangd", "/usr/bin/clangd",
       },
-      on_attach = function(client, bufnr)
-        -- OPTIONAL: your custom disable diagnostics
-        -- client.server_capabilities.diagnosticProvider = {
-        --   documentProvider = {
-        --     syntaxErrors = false,
-        --   },
-        --   workspaceProvider = false,
-        -- }
-        -- vim.diagnostic.disable(bufnr)
-        keys.lsp_keymaps(bufnr)
-      end,
       capabilities = capabilities,
+      root_dir = vim.fs.root(0, { "*.ino" }),
     })
 
+    -- Configure all servers from helper.servers
     for _, server in pairs(servers) do
       local opts = {
-        on_attach = on_attach,
         capabilities = capabilities
       }
 
       server = vim.split(server, '@')[1]
+      
+      -- Load server-specific configuration if it exists
       local require_ok, conf_opts = pcall(require, "plugins.lsp.servers." .. server)
-      if (require_ok) then
+      if require_ok then
         opts = vim.tbl_deep_extend("force", opts, conf_opts)
       end
 
-      lspconfig[server].setup(opts);
+      vim.lsp.config(server, opts)
     end
+
+    -- Enable all configured servers
+    local server_names = {}
+    table.insert(server_names, "arduino_language_server")
+    for _, server in pairs(servers) do
+      table.insert(server_names, vim.split(server, '@')[1])
+    end
+    
+    vim.lsp.enable(server_names)
   end
 }
