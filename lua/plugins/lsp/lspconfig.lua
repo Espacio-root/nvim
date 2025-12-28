@@ -22,13 +22,20 @@ return {
     capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 
     -- Configure Arduino Language Server
+    -- local arduino_caps = vim.tbl_deep_extend("force", {}, capabilities)
+    -- arduino_caps.offsetEncoding = { "utf-16" }
     vim.lsp.config("arduino_language_server", {
       cmd = {
         "arduino-language-server",
         "-cli-config", "/home/espacio/.arduino15/arduino-cli.yaml",
-        "-fqbn", "arduino:avr:uno",
         "-cli", "/usr/bin/arduino-cli",
-        "-clangd", "/usr/bin/clangd",
+        "-fqbn", "esp32:esp32:esp32",
+        "-clangd", "/usr/bin/clangd"
+      },
+      init_options = {
+        clangdArgs = {
+          "--query-driver=**"  -- Allows clangd to read any compiler's paths
+        }
       },
       capabilities = capabilities,
       root_dir = vim.fs.root(0, { "*.ino" }),

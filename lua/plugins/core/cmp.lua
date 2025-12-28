@@ -4,6 +4,7 @@ return {
     "InsertEnter",
     "CmdlineEnter",
   },
+  commit = "059e894",
   dependencies = {
     { "hrsh7th/cmp-buffer" },
     { "hrsh7th/cmp-nvim-lsp" },
@@ -14,6 +15,7 @@ return {
     { "hrsh7th/cmp-calc" },
     { "saadparwaiz1/cmp_luasnip" },
     { "lukas-reineke/cmp-under-comparator" },
+    { "hrsh7th/cmp-nvim-lua" },
   },
   config = function()
     local cmp = require "cmp"

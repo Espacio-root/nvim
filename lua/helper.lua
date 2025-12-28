@@ -18,11 +18,14 @@ M.servers = {
 
 M.arduino_compile = function()
     local sketch_path = vim.fn.expand("%:p:h") -- Get the current file's directory
-    local fqbn = "arduino:avr:nano:cpu=atmega328old"           -- Replace with your board's FQBN
+    local fqbn = "arduino:avr:nano"           -- Replace with your board's FQBN
+    local baud_rate = 9600
+    -- local fqbn = "esp32:esp32:esp32"
+    -- local baud_rate = 115200
     local port = "/dev/ttyUSB0"              -- Replace with your board's port
     local full_cmd = string.format(
-        "arduino-cli compile --fqbn %s --upload -p %s %s && arduino-cli monitor -p %s",
-        fqbn, port, sketch_path, port
+        "arduino-cli compile --fqbn %s --upload -p %s %s && arduino-cli monitor -p %s --config baudrate=%s",
+        fqbn, port, sketch_path, port, baud_rate
     )
 
     -- Create a new buffer
