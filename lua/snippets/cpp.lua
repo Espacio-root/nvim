@@ -8,6 +8,8 @@ local template = s(
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <random>
+#include <chrono>
 
 using namespace std;
 
@@ -25,6 +27,8 @@ using vs = vector<string>; using vvs = vector<vs>;
 
 #define ff first
 #define ss second
+
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 /** small observations:
 **/
@@ -581,6 +585,189 @@ public:
     }, { delimiters = "@$" })
 )
 
+local stress_gen = s(
+    { trig = "GEN", dsrc = "Test Case Generator" },
+    fmta([[
+namespace Gen {
+    long long rand_int(long long l, long long r) {
+        return uniform_int_distribution<long long>(l,r)(rng);
+    }
+
+    vector<long long> gen_array(int n, long long min_val, long long max_val) {
+        vector<long long> a(n);
+        for (int i=0; i<n; i++) {
+            a[i]=rand_int(min_val,max_val);
+        }
+        return a;
+    }
+
+    string gen_string(int n, const string& alphabet = "abcdefghijklmnopqrstuvwxyz") {
+        string s="";
+        for (int i=0; i<n; i++) s+=alphabet[rand_int(0,alphabet.length()-1)];
+        return s;
+    }
+
+    vector<int> gen_permutation(int n, int start_val = 1) {
+        vector<int> p(n);
+        iota(p.begin(), p.end(), start_val);
+        shuffle(p.begin(), p.end(), rng);
+        return p;
+    }
+
+    vector<long long> gen_distinct_array(int n, long long min_val, long long max_val) {
+        if (max_val - min_val + 1 < n) {
+            cerr << "[Gen Error] Range is smaller than n!" << "\n";
+            return {};
+        }
+        set<long long> st;
+        while (st.size() < n) {
+            st.insert(rand_int(min_val, max_val));
+        }
+
+        vector<long long> a(st.begin(), st.end());
+        shuffle(a.begin(), a.end(), rng);
+
+        return a;
+    }
+}
+
+namespace GenGraph {
+    string random_tree(int n) {
+        stringstream ss;
+        ss<<n<<'\n';
+        for (int u=2; u<=n; u++) {
+            int v=Gen::rand_int(1, u-1);
+            if (Gen::rand_int(0, 1)) swap(u, v);
+            ss<<u<<' '<<v<<'\n';
+        }
+        return ss.str();
+    }
+}
+
+namespace Gen {
+    string generate() {
+    }
+}
+  ]], {
+    }, { delimiters = "@$" })
+)
+
+local stress_test = s(
+    { trig = "STRESS", dsrc = "Stress Tester - Brute vs Solve" },
+    fmta([[
+void stress() {
+    int test_cases=0;
+    streambuf* original_cin = cin.rdbuf();
+
+    while (true) {
+        test_cases++;
+
+        string tc_string = Gen::generate();
+
+        // void return type
+        // stringstream ss_in_slow(tc_string);
+        // ostringstream ss_out_slow;
+        // cin.rdbuf(ss_in_slow.rdbuf());
+        // cout.rdbuf(ss_out_slow.rdbuf());
+        // brute();
+        // auto slow_ans=ss_out_slow.str();
+        //
+        // stringstream ss_in_fast(tc_string);
+        // ostringstream ss_out_fast;
+        // cin.rdbuf(ss_in_fast.rdbuf());
+        // cout.rdbuf(ss_out_fast.rdbuf());
+        // solve();
+        // auto fast_ans=ss_out_fast.str();
+
+        // non-void return type
+        stringstream ss_slow(tc_string);
+        cin.rdbuf(ss_slow.rdbuf());
+        auto slow_ans=brute();
+
+        stringstream ss_fast(tc_string);
+        cin.rdbuf(ss_fast.rdbuf());
+        auto fast_ans=solve();
+
+        if (slow_ans != fast_ans) {
+            cin.rdbuf(original_cin);
+            cout << "Wrong Answer found on Test " << test_cases << "!\n";
+            cout << "--- Input ---\n" << tc_string;
+            cout << "--- Slow Output ---\n" << slow_ans << "\n";
+            cout << "--- Fast Output ---\n" << fast_ans << "\n";
+            break;
+        }
+
+        if (test_cases % 1000 == 0) {
+            cin.rdbuf(original_cin);
+            cout << test_cases << " tests passed...\n";
+        }
+    }
+    cin.rdbuf(original_cin);
+}
+  ]], {
+    }, { delimiters = "@$" })
+)
+
+local stress_checker = s(
+    { trig = "CHECK", dsrc = "Checker for Stress Testing" },
+    fmta([[
+bool checker(string tc_string, string ans, string &feedback) {
+    stringstream ss_in(tc_string), ss_ans(ans);
+
+    int n; ss_in>>n;
+
+    return true;
+}
+
+void stress() {
+    int test_cases=0;
+    streambuf* original_cin = cin.rdbuf();
+
+    while (true) {
+        test_cases++;
+
+        string tc_string = Gen::generate();
+
+        // void return type
+        // stringstream ss_in_fast(tc_string);
+        // ostringstream ss_out_fast;
+        // cin.rdbuf(ss_in_fast.rdbuf());
+        // cout.rdbuf(ss_out_fast.rdbuf());
+        // solve();
+        // auto fast_ans=ss_out_fast.str();
+
+        // non-void return type
+        stringstream ss_in(tc_string);
+        cin.rdbuf(ss_in.rdbuf());
+
+        stringstream ss_out;
+        ss_out<<solve();
+        string ans=ss_out.str();
+
+        string feedback;
+
+        if (!checker(tc_string, ans, feedback)) {
+            cin.rdbuf(original_cin);
+            cout << "Wrong Answer found on Test " << test_cases << "!\n";
+            if (!feedback.empty()) {
+                cout << "--- Feedback -- \n" << feedback << "\n";
+            }
+            cout << "--- Input ---\n" << tc_string;
+            cout << "--- Output ---\n" << ans << "\n";
+            break;
+        }
+
+        if (test_cases % 1000 == 0) {
+            cin.rdbuf(original_cin);
+            cout << test_cases << " tests passed...\n";
+        }
+    }
+    cin.rdbuf(original_cin);
+}
+  ]], {
+    }, { delimiters = "@$" })
+)
+
 return {
     template,
     sparse_table,
@@ -592,5 +779,8 @@ return {
     lca,
     ordered_set,
     matrix_arr,
-    matrix_vec
+    matrix_vec,
+    stress_gen,
+    stress_test,
+    stress_checker
 }

@@ -55,7 +55,8 @@ return {
         opts = vim.tbl_deep_extend("force", opts, conf_opts)
       end
 
-      vim.lsp.config(server, opts)
+      vim.lsp.config(server,opts)
+      -- require("lspconfig")[server].setup(opts)
     end
 
     -- Enable all configured servers

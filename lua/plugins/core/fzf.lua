@@ -1,5 +1,6 @@
 local keys = require("keymaps")
 
+
 return {
   "ibhagwan/fzf-lua",
   -- optional for icon support

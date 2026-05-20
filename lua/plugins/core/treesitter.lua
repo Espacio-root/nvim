@@ -1,57 +1,47 @@
-local function disable_treesitter(lang, buf)
-  local max_filesize = 100 * 1024 -- 100 KB
-  local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-  if ok and stats and stats.size > max_filesize then
-    return true
-  end
+local max_filesize = 100 * 1024 -- 100 KB
+
+--- Check if treesitter should be disabled for a buffer (large files).
+local function is_large_file(buf)
+  local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+  return ok and stats and stats.size > max_filesize
 end
 
 return {
   "nvim-treesitter/nvim-treesitter",
+  lazy = false,
   build = ":TSUpdate",
-  commit = "3826d0c42ac635f560479b5b6ab522f6627a3466",
   config = function()
-    require("nvim-treesitter.configs").setup {
-      -- ensure_installed = { "python", "c", "cpp", "lua", "javascript", "typescript", "html", "css" },
-      ensured_installed = "all",
-      ignore_install = { "latex", "systemverilog" },
-      sync_install = false,
-      auto_install = true,
+    -- The new nvim-treesitter only handles parser installation.
+    -- Highlight, indent, etc. are now built into Neovim core.
+    require("nvim-treesitter").setup()
 
-      highlight = {
-        enable = true,
-        disable = disable_treesitter,
-      },
+    -- Auto-install parsers on FileType
+    vim.api.nvim_create_autocmd("FileType", {
+      desc = "Auto-install treesitter parser for filetype",
+      callback = function(ev)
+        if is_large_file(ev.buf) then
+          return
+        end
+        local lang = vim.treesitter.language.get_lang(ev.match)
+        if lang and not pcall(vim.treesitter.language.inspect, lang) then
+          require("nvim-treesitter").install({ lang })
+        end
+      end,
+    })
 
-      indent = {
-        enable = true,
-        disable = disable_treesitter,
-      },
-
-      endwise = {
-        enable = true,
-        disable = disable_treesitter,
-      },
-
-      pairs = {
-        enable = true,
-        disable = {},
-        highlight_pair_events = { "CursorMoved", "ModeChanged" },
-        highlight_self = false,                                       -- whether to highlight also the part of the pair under cursor (or only the partner)
-        goto_right_end = false,                                       -- whether to go to the end of the right partner or the beginning
-        fallback_cmd_normal = "call matchit#Match_wrapper('',1,'n')", -- What command to issue when we can't find a pair (e.g. "normal! %")
-        keymaps = {
-          goto_partner = "<leader>%",
-          delete_balanced = "X",
-        },
-        delete_balanced = {
-          only_on_first_char = false, -- whether to trigger balanced delete when on first character of a pair
-          fallback_cmd_normal = nil,  -- fallback command when no pair found, can be nil
-          longest_partner = false,    -- whether to delete the longest or the shortest pair when multiple found.
-          -- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
-        }
-      }
-
-    }
+    -- Enable treesitter highlighting and indentation for all filetypes,
+    -- skipping large files.
+    vim.api.nvim_create_autocmd("FileType", {
+      desc = "Enable treesitter highlighting and indentation",
+      callback = function(ev)
+        if is_large_file(ev.buf) then
+          return
+        end
+        -- Enable highlighting (replaces the old highlight = { enable = true })
+        pcall(vim.treesitter.start, ev.buf)
+        -- Enable indentation (replaces the old indent = { enable = true })
+        vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      end,
+    })
   end,
 }

@@ -4,4 +4,5 @@ require "autocmds"
 require "manager"
 
 -- vim.cmd('colorscheme base16-primer-dark')
-vim.cmd('colorscheme base16-onedark')
+-- vim.cmd('colorscheme base16-onedark')
+vim.cmd('colorscheme base16-chinoiserie-midnight')

@@ -4,7 +4,7 @@ return {
     "InsertEnter",
     "CmdlineEnter",
   },
-  commit = "059e894",
+  -- commit = "059e894",
   dependencies = {
     { "hrsh7th/cmp-buffer" },
     { "hrsh7th/cmp-nvim-lsp" },
@@ -18,9 +18,10 @@ return {
     { "hrsh7th/cmp-nvim-lua" },
   },
   config = function()
-    local cmp = require "cmp"
-    local luasnip = require "luasnip"
-    local lspkind = require "lspkind"
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
+    local lspkind = require("lspkind")
+    local icons = require("icons")
 
     cmp.setup {
       window = {
@@ -38,6 +39,11 @@ return {
         format = lspkind.cmp_format {
           mode = "symbol",
           maxwidth = 50,
+          symbol_map = icons.icons.kind,
+          before = function(_, vim_item)
+            vim_item.kind = lspkind.symbolic(vim_item.kind)
+            return vim_item
+          end,
           menu = {
             luasnip = "[SNP]",
             nvim_lsp = "[LSP]",
