@@ -593,7 +593,8 @@ namespace Gen {
         return uniform_int_distribution<long long>(l,r)(rng);
     }
 
-    vector<long long> gen_array(int n, long long min_val, long long max_val) {
+    vector<long long> gen_array(int min_n, int max_n, long long min_val, long long max_val) {
+        int n=(min_n==max_n?min_n:rand_int(min_n,max_n));
         vector<long long> a(n);
         for (int i=0; i<n; i++) {
             a[i]=rand_int(min_val,max_val);
@@ -601,33 +602,11 @@ namespace Gen {
         return a;
     }
 
-    string gen_string(int n, const string& alphabet = "abcdefghijklmnopqrstuvwxyz") {
+    string gen_string(int min_n, int max_n, const string& alphabet = "abcdefghijklmnopqrstuvwxyz") {
+        int n=(min_n==max_n?min_n:rand_int(min_n,max_n));
         string s="";
         for (int i=0; i<n; i++) s+=alphabet[rand_int(0,alphabet.length()-1)];
         return s;
-    }
-
-    vector<int> gen_permutation(int n, int start_val = 1) {
-        vector<int> p(n);
-        iota(p.begin(), p.end(), start_val);
-        shuffle(p.begin(), p.end(), rng);
-        return p;
-    }
-
-    vector<long long> gen_distinct_array(int n, long long min_val, long long max_val) {
-        if (max_val - min_val + 1 < n) {
-            cerr << "[Gen Error] Range is smaller than n!" << "\n";
-            return {};
-        }
-        set<long long> st;
-        while (st.size() < n) {
-            st.insert(rand_int(min_val, max_val));
-        }
-
-        vector<long long> a(st.begin(), st.end());
-        shuffle(a.begin(), a.end(), rng);
-
-        return a;
     }
 }
 
@@ -645,7 +624,9 @@ namespace GenGraph {
 }
 
 namespace Gen {
-    string generate() {
+    void generate() {
+        int n=Gen::rand_int(1,1000);
+        cout<<n<<'\n';
     }
 }
   ]], {
@@ -658,11 +639,16 @@ local stress_test = s(
 void stress() {
     int test_cases=0;
     streambuf* original_cin = cin.rdbuf();
+    streambuf* original_cout = cout.rdbuf();
 
     while (true) {
         test_cases++;
 
-        string tc_string = Gen::generate();
+        stringstream ss_test;
+        cout.rdbuf(ss_test.rdbuf());
+        Gen::generate();
+        string tc_string=ss_test.str();
+        cout.rdbuf(original_cout);
 
         // void return type
         // stringstream ss_in_slow(tc_string);
@@ -714,43 +700,57 @@ local stress_checker = s(
 bool checker(string tc_string, string ans, string &feedback) {
     stringstream ss_in(tc_string), ss_ans(ans);
 
-    int n; ss_in>>n;
+    int res; ss_ans<<ans;
 
-    return true;
+    int n; ss_in>>n;
+    int sm=0;
+    for (int i=0; i<n; i++) {
+        int v; ss_in>>v;
+        sm+=v;
+    }
+
+    return sm==res;
 }
 
 void stress() {
     int test_cases=0;
     streambuf* original_cin = cin.rdbuf();
+    streambuf* original_cout = cout.rdbuf();
 
     while (true) {
         test_cases++;
 
-        string tc_string = Gen::generate();
+        stringstream ss_test;
+        cout.rdbuf(ss_test.rdbuf());
+        Gen::generate();
+        string tc_string=ss_test.str();
+        cout.rdbuf(original_cout);
 
         // void return type
-        // stringstream ss_in_fast(tc_string);
-        // ostringstream ss_out_fast;
-        // cin.rdbuf(ss_in_fast.rdbuf());
-        // cout.rdbuf(ss_out_fast.rdbuf());
-        // solve();
-        // auto fast_ans=ss_out_fast.str();
+        stringstream ss_in_fast(tc_string);
+        ostringstream ss_out_fast;
+        cin.rdbuf(ss_in_fast.rdbuf());
+        cout.rdbuf(ss_out_fast.rdbuf());
+        solve();
+        auto ans=ss_out_fast.str();
 
         // non-void return type
-        stringstream ss_in(tc_string);
-        cin.rdbuf(ss_in.rdbuf());
+        // stringstream ss_in(tc_string);
+        // cin.rdbuf(ss_in.rdbuf());
+        //
+        // stringstream ss_out;
+        // ss_out<<solve();
+        // string ans=ss_out.str();
 
-        stringstream ss_out;
-        ss_out<<solve();
-        string ans=ss_out.str();
-
-        string feedback;
+        stringstream feedback;
 
         if (!checker(tc_string, ans, feedback)) {
             cin.rdbuf(original_cin);
+            cout.rdbuf(original_cout);
             cout << "Wrong Answer found on Test " << test_cases << "!\n";
-            if (!feedback.empty()) {
-                cout << "--- Feedback -- \n" << feedback << "\n";
+            string feedback_str=feedback.str();
+            if (!feedback_str.empty()) {
+                cout << "--- Feedback -- \n" << feedback_str << "\n";
             }
             cout << "--- Input ---\n" << tc_string;
             cout << "--- Output ---\n" << ans << "\n";
@@ -759,10 +759,47 @@ void stress() {
 
         if (test_cases % 1000 == 0) {
             cin.rdbuf(original_cin);
+            cout.rdbuf(original_cout);
             cout << test_cases << " tests passed...\n";
         }
     }
     cin.rdbuf(original_cin);
+}
+  ]], {
+    }, { delimiters = "@$" })
+)
+
+local nCr = s(
+    { trig = "NCR", dsrc = "Combinatorics (nCr)" },
+    fmta([[
+const int N = 1e6+5, mod = 1e9+7;
+vi fact(2*N+1);
+
+void pre() {
+    fact[0]=fact[1]=1;
+    for (int i=2; i<=2*N; i++) fact[i]=(fact[i-1]*i)%mod;
+}
+
+int modPow(int a, int b) {
+    int ans=1;
+    a%=mod;
+    while (b) {
+        if (b%2) ans=(ans*a)%mod;
+        a=(a*a)%mod; b/=2;
+    }
+    return ans;
+}
+
+int modInv(int a) {
+    if (a==0) return 0;
+    return modPow(a,mod-2);
+}
+
+int nCr(int n, int r) {
+    if (r<0 || r>n) return 0;
+    int num=fact[n];
+    int den=(fact[r]*fact[n-r])%mod;
+    return (num*modInv(den))%mod;
 }
   ]], {
     }, { delimiters = "@$" })
@@ -782,5 +819,6 @@ return {
     matrix_vec,
     stress_gen,
     stress_test,
-    stress_checker
+    stress_checker,
+    nCr
 }
