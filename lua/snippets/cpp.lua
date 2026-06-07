@@ -186,17 +186,16 @@ struct SegTree {
     int n;
     vector<T> arr;
 
-    static constexpr T def=0;
+    static constexpr T def=-1;
     T f(T &a, T &b) {
-        return a+b;
+        return max(a,b);
     }
 
-    SegTree(vector<T> &arr) {
-        int m=1, n=arr.size();
+    SegTree(int n) {
+        int m=1;
         while (m<n) m*=2;
         this->n = m;
         this->arr.assign(2*this->n-1, def);
-        build(0,this->n-1,0,arr);
     }
 
     void build(int l, int r, int x, vector<T> &arr) {
@@ -210,6 +209,7 @@ struct SegTree {
         build(m+1,r,2*x+2,arr);
         this->arr[x]=f(this->arr[2*x+1], this->arr[2*x+2]);
     }
+    void build(vector<T> &arr) {build(0,this->n-1,0,arr);}
 
     T query(int l, int r, int lx, int rx, int x) {
         if (lx>=l && rx<=r) return this->arr[x];
