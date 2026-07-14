@@ -805,6 +805,60 @@ int nCr(int n, int r) {
     }, { delimiters = "@$" })
 )
 
+local cht = s(
+    { trig = "CHT", dsrc = "Convex Hull Trick (CHT)" },
+    fmta([[
+struct Line {
+    long long m, c;
+
+    long long eval(long long x) const {
+        return m * x + c;
+    }
+
+    long double intersectX(const Line& other) const {
+        return (long double)(other.c - c) / (m - other.m);
+    }
+};
+
+struct CHT {
+    vector<Line> hull;
+
+    bool is_redundant(const Line& l1, const Line& l2, const Line& l3) {
+        return l1.intersectX(l3) <= l1.intersectX(l2);
+    }
+
+    // slopes must be added in strictly increasing order
+    void add(long long m, long long c) {
+        Line L = {m, c};
+        while (hull.size() >= 2 && is_redundant(hull[hull.size()-2], hull.back(), L)) {
+            hull.pop_back();
+        }
+        hull.push_back(L);
+    }
+
+    long long query(long long x) {
+        if (hull.empty()) return -4e18;
+
+        int l = 0, r = hull.size() - 2;
+        int best_line_idx = hull.size() - 1;
+
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+
+            if (hull[mid].intersectX(hull[mid+1]) <= x) {
+                l = mid + 1;
+            } else {
+                best_line_idx = mid;
+                r = mid - 1;
+            }
+        }
+        return hull[best_line_idx].eval(x);
+    }
+};
+  ]], {
+    }, { delimiters = "@$" })
+)
+
 return {
     template,
     sparse_table,
@@ -820,5 +874,6 @@ return {
     stress_gen,
     stress_test,
     stress_checker,
-    nCr
+    nCr,
+    cht
 }
