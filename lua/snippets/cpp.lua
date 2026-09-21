@@ -245,89 +245,74 @@ local lazysegtree = s(
 template <typename T>
 struct LazySegTree {
     int n;
-    vector<T> arr;
-    vector<T> lazy;
+    vector<T> arr, lazy;
 
-    // ================= CONFIGURATION START =================
-    // 1. Identity Element for Query (Sum: 0, Max: -1e18)
-    static constexpr T q_def = 0;
+    static constexpr T def_val = -1;
+    static constexpr T def_lazy = 0;
 
-    // 2. Identity Element for Lazy (Add: 0, Set: -1 (or generic flag))
-    static constexpr T l_def = 0;
-
-    // 3. Merge Logic for Query (Sum: a+b, Max: max(a,b))
     T f(T a, T b) {
-        return a + b;
+        return max(a, b);
     }
 
-    // 4. Apply Logic: How to apply update 'v' to node 'val' & lazy 'lz'
-    //    'len' is the length of the current segment.
-    void apply(T &val, T &lz, T v, int len) {
-        // Example: Range Sum + Range Add
-        val += v * len;
-        lz += v;
-
-        // Example: Range Max + Range Set
-        // val = v;
-        // lz = v;
+    void apply(int x, int lx, int rx, T v) {
+        arr[x] += v;
+        lazy[x] += v;
     }
-    // ================== CONFIGURATION END ==================
 
-    LazySegTree(vector<T> &arr) {
-        int m=1, n=arr.size();
-        while (m<n) m*=2;
+    LazySegTree(int n) {
+        int m = 1;
+        while (m < n) m *= 2;
         this->n = m;
-        this->arr.assign(2*this->n-1, q_def);
-        this->lazy.assign(2*this->n-1, l_def);
-        build(0,this->n-1,0,arr);
+        arr.assign(2 * this->n - 1, def_val);
+        lazy.assign(2 * this->n - 1, def_lazy);
     }
 
-    void build(int l, int r, int x, vector<T> &arr) {
-        if (r-l==0) {
-            if (l<arr.size())
-                this->arr[x]=arr[l];
+    void push(int x, int lx, int rx) {
+        if (lazy[x] == def_lazy || lx == rx) return;
+        int m = lx + (rx - lx) / 2;
+        apply(2 * x + 1, lx, m, lazy[x]);
+        apply(2 * x + 2, m + 1, rx, lazy[x]);
+        lazy[x] = def_lazy;
+    }
+
+    void build(int l, int r, int x, const vector<T> &init_arr) {
+        if (l == r) {
+            if (l < init_arr.size()) arr[x] = init_arr[l];
             return;
         }
-        int m=l+(r-l)/2;
-        build(l,m,2*x+1,arr);
-        build(m+1,r,2*x+2,arr);
-        this->arr[x]=f(this->arr[2*x+1], this->arr[2*x+2]);
+        int m = l + (r - l) / 2;
+        build(l, m, 2 * x + 1, init_arr);
+        build(m + 1, r, 2 * x + 2, init_arr);
+        arr[x] = f(arr[2 * x + 1], arr[2 * x + 2]);
     }
-
-    void push(int lx, int rx, int x) {
-        if (lazy[x] == l_def) return;
-        int m = lx + (rx - lx) / 2;
-
-        apply(arr[2*x+1], lazy[2*x+1], lazy[x], m - lx + 1);
-        apply(arr[2*x+2], lazy[2*x+2], lazy[x], rx - m);
-
-        lazy[x] = l_def;
-    }
+    void build(const vector<T> &init_arr) { build(0, n - 1, 0, init_arr); }
 
     void update(int l, int r, T v, int lx, int rx, int x) {
-        if (lx>r || l>rx) return;
-        if (lx>=l && rx<=r) {
-            apply(arr[x], lazy[x], v, rx - lx + 1);
+        if (lx >= l && rx <= r) {
+            apply(x, lx, rx, v);
             return;
         }
-        push(lx, rx, x);
-        int m=lx+(rx-lx)/2;
-        update(l,r,v,lx,m,2*x+1);
-        update(l,r,v,m+1,rx,2*x+2);
-        this->arr[x]=f(this->arr[2*x+1], this->arr[2*x+2]);
+        if (lx > r || rx < l) return;
+        push(x, lx, rx);
+
+        int m = lx + (rx - lx) / 2;
+        update(l, r, v, lx, m, 2 * x + 1);
+        update(l, r, v, m + 1, rx, 2 * x + 2);
+        arr[x] = f(arr[2 * x + 1], arr[2 * x + 2]);
     }
-    void update(int l, int r, T v) {update(l,r,v,0,this->n-1,0);}
+    void update(int l, int r, T v) { update(l, r, v, 0, n - 1, 0); }
 
     T query(int l, int r, int lx, int rx, int x) {
-        if (lx>r || l>rx) return q_def;
-        if (lx>=l && rx<=r) return this->arr[x];
-        push(lx, rx, x);
-        int m=lx+(rx-lx)/2;
-        T s1=query(l,r,lx,m,2*x+1);
-        T s2=query(l,r,m+1,rx,2*x+2);
-        return f(s1,s2);
+        if (lx >= l && rx <= r) return arr[x];
+        if (lx > r || l > rx) return def_val;
+        push(x, lx, rx);
+
+        int m = lx + (rx - lx) / 2;
+        T s1 = query(l, r, lx, m, 2 * x + 1);
+        T s2 = query(l, r, m + 1, rx, 2 * x + 2);
+        return f(s1, s2);
     }
-    T query(int l, int r) {return query(l,r,0,this->n-1,0);}
+    T query(int l, int r) { return query(l, r, 0, n - 1, 0); }
 };
   ]], {
     }, { delimiters = "^$" })
